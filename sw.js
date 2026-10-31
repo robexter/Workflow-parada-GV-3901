@@ -1,6 +1,37 @@
-/* Cache restrito aos arquivos estáticos da aplicação; dados são mantidos fora do SW. */
-const V='gv3901-v1-1-multiusuario-icons-20261031';
-const SHELL=['./','./index.html','./assets/app.js','./assets/styles.css','./manifest.webmanifest','./assets/cloud-config.js','./assets/icon-192.png','./assets/icon-512.png','./assets/icon-maskable-192.png','./assets/icon-maskable-512.png','./assets/apple-touch-icon.png'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(V).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('gv3901-')&&k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const url=new URL(e.request.url);if(url.origin!==location.origin||!SHELL.some(p=>new URL(p,self.registration.scope).pathname===url.pathname))return;e.respondWith(fetch(e.request).then(r=>{if(r.ok){const copy=r.clone();caches.open(V).then(c=>c.put(e.request,copy));}return r;}).catch(()=>caches.match(e.request)))});
+/* GV-3901 / Homologacao: evitar cache de configuracao Supabase. */
+const CACHE = 'gv3901-v1-1-homologacao-r2';
+const SHELL = [
+  './', './index.html', './assets/app.js', './assets/styles.css',
+  './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png',
+  './assets/icon-maskable-192.png', './assets/icon-maskable-512.png',
+  './assets/apple-touch-icon.png'
+];
+const CONFIG_PATH = new URL('./assets/cloud-config.js', self.registration.scope).pathname;
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.filter(key => key.startsWith('gv3901-v1-1-') && key !== CACHE)
+        .map(key => caches.delete(key))
+    )).then(() => self.clients.claim())
+  );
+});
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  const requestUrl = new URL(event.request.url);
+  if (requestUrl.origin !== self.location.origin) return;
+  // Sempre buscar o arquivo de configuracao na rede, sem armazenar no Cache Storage.
+  if (requestUrl.pathname === CONFIG_PATH) return;
+  if (!SHELL.some(path => new URL(path, self.registration.scope).pathname === requestUrl.pathname)) return;
+  event.respondWith(
+    fetch(event.request).then(response => {
+      if (response.ok) {
+        const copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put(event.request, copy));
+      }
+      return response;
+    }).catch(() => caches.match(event.request))
+  );
+});
