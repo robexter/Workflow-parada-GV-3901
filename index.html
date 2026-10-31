@@ -9,12 +9,31 @@
 </head>
 <body>
 <div id="app"><div class="splash"><span class="logo-square">GV</span><h1>GV-3901 parada</h1><p>Preparando acesso multiusuário...</p></div></div>
+<!-- Se algum recurso externo falhar, evitar uma tela inicial indefinidamente sem orientação. -->
+<script>
+window.setTimeout(function () {
+  var splash = document.querySelector('#app > .splash');
+  if (!splash) return;
+  var message = splash.querySelector('p');
+  if (message) message.textContent = 'Não foi possível concluir o carregamento. Verifique sua conexão e atualize a página.';
+  if (!splash.querySelector('[data-gv-reload]')) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Recarregar aplicativo';
+    btn.setAttribute('data-gv-reload', '');
+    btn.style.cssText = 'margin:20px auto 0;padding:12px 18px;border:0;border-radius:10px;background:#087f90;color:white;font:600 16px system-ui;cursor:pointer;display:block';
+    btn.addEventListener('click', function () { location.reload(); });
+    splash.appendChild(btn);
+  }
+}, 15000);
+</script>
 <script defer src="./assets/cloud-config.js?v=gv3901-hml-r2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
-<!-- Adaptadores de autenticação/membros: preservam assets/app.js e UUIDs existentes. -->
-<script defer src="./assets/username-login.js?v=gv3901-membros-r4"></script>
-<script defer src="./assets/membros-config.js?v=gv3901-membros-r4"></script>
-<script defer src="./assets/membros-acesso.js?v=gv3901-membros-r5"></script>
-<script defer src="./assets/app.js?v=gv3901-membros-r4"></script>
+<!-- Adaptadores de autenticação/membros: não alteram a especificação V1.2 congelada. -->
+<script defer src="./assets/username-login.js?v=gv3901-membros-r6"></script>
+<script defer src="./assets/membros-config.js?v=gv3901-membros-r6"></script>
+<script defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script>
+<script defer src="./assets/membros-acesso.js?v=gv3901-membros-r6"></script>
+<script defer src="./assets/app.js?v=gv3901-membros-r6"></script>
 </body>
 </html>
