@@ -1,8 +1,9 @@
-/* GV-3901 / Homologacao: evitar cache de configuracao Supabase. */
-const CACHE = 'gv3901-v1-1-homologacao-r2';
+/* GV-3901 / HOMOLOGAÇÃO: não cachear configuração nem credenciais Supabase. */
+const CACHE = 'gv3901-v1-1-homologacao-username-r3';
 const SHELL = [
-  './', './index.html', './assets/app.js', './assets/styles.css',
-  './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png',
+  './', './index.html', './assets/app.js', './assets/username-login.js',
+  './assets/styles.css', './manifest.webmanifest',
+  './assets/icon-192.png', './assets/icon-512.png',
   './assets/icon-maskable-192.png', './assets/icon-maskable-512.png',
   './assets/apple-touch-icon.png'
 ];
@@ -22,7 +23,6 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;
-  // Sempre buscar o arquivo de configuracao na rede, sem armazenar no Cache Storage.
   if (requestUrl.pathname === CONFIG_PATH) return;
   if (!SHELL.some(path => new URL(path, self.registration.scope).pathname === requestUrl.pathname)) return;
   event.respondWith(
