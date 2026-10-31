@@ -40,7 +40,7 @@
     note.className = 'muted';
     note.style.fontSize = '12px';
     note.style.marginTop = '6px';
-    note.textContent = 'Utilize o usuário e a senha fornecidos pelo administrador. Não é necessário e-mail pessoal.';
+    note.textContent = 'Use seu nome de usuário e senha após a aprovação do administrador. Não é necessário e-mail pessoal.';
     field.insertAdjacentElement('afterend', note);
   }
 
