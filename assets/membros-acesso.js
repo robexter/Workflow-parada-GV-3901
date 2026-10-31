@@ -27,12 +27,45 @@
       <form id="gv-members-signup-form" autocomplete="off">
         <label for="gv-reg-name">Nome de identificação</label><input class="input" id="gv-reg-name" name="displayName" minlength="3" maxlength="120" required autocomplete="name" />
         <label for="gv-reg-user">Nome de usuário</label><input class="input" id="gv-reg-user" name="username" minlength="3" maxlength="32" required autocapitalize="none" autocomplete="off" placeholder="Ex.: operador01" />
-        <label for="gv-reg-password">Senha (mínimo 12 caracteres)</label><input class="input" type="password" id="gv-reg-password" name="password" minlength="12" maxlength="128" required autocomplete="new-password" />
-        <label for="gv-reg-confirm">Confirme a senha</label><input class="input" type="password" id="gv-reg-confirm" name="confirm" minlength="12" maxlength="128" required autocomplete="new-password" />
+        <label for="gv-reg-password">Senha (mínimo 6 caracteres)</label><input class="input" type="password" id="gv-reg-password" name="password" minlength="6" maxlength="128" required autocomplete="new-password" />
+        <label for="gv-reg-confirm">Confirme a senha</label><input class="input" type="password" id="gv-reg-confirm" name="confirm" minlength="6" maxlength="128" required autocomplete="new-password" />
         <div id="gv-turnstile" style="margin:14px 0;max-width:100%;overflow:hidden"></div>
         <div id="gv-registration-message" role="status" aria-live="polite" style="font-size:12px;margin:12px 0"></div>
         <button class="btn primary" type="submit" id="gv-register-submit">Solicitar cadastro</button>
       </form></div>`;
+  }
+  // Visualizar/ocultar senha no login, cadastro e confirmação.
+  // Instala no máximo um botão por campo, inclusive após re-render do app.js.
+  const eyeSvg = `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const eyeOffSvg = `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/></svg>`;
+  function setPasswordVisibility(field, button, visible) {
+    if (!field || !button) return;
+    field.type = visible ? 'text' : 'password';
+    const label = visible ? 'Ocultar senha' : 'Mostrar senha';
+    button.setAttribute('aria-label', label);
+    button.setAttribute('aria-pressed', String(visible));
+    button.setAttribute('title', label);
+    button.innerHTML = visible ? eyeOffSvg : eyeSvg;
+  }
+  function mountPasswordEyes() {
+    for (const id of ['cloud-pass', 'gv-reg-password', 'gv-reg-confirm']) {
+      const field = document.getElementById(id);
+      if (!field || field.dataset.gvEyeReady === 'yes') continue;
+      const parent = field.parentElement;
+      if (!parent) continue;
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'position:relative;width:100%;max-width:100%;min-width:0;';
+      parent.insertBefore(wrapper, field);
+      wrapper.appendChild(field);
+      field.style.paddingRight = '54px';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.gvPasswordEye = id;
+      button.style.cssText = 'position:absolute;right:3px;top:50%;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;background:transparent;color:#31576d;cursor:pointer;z-index:1;';
+      setPasswordVisibility(field, button, field.type === 'text');
+      wrapper.appendChild(button);
+      field.dataset.gvEyeReady = 'yes';
+    }
   }
   function mountLogin() {
     const form = document.getElementById('cloud-login-form');
@@ -110,7 +143,7 @@ if (trigger.textContent !== nextLabel) {
     const name = String(form.elements.displayName.value).trim();
     const pass = String(form.elements.password.value);
     if (!validName(u)) return msg(status,'Usuário deve começar com letra e ter de 3 a 32 caracteres.',true);
-    if (pass.length<12 || pass!==form.elements.confirm.value) return msg(status,'As senhas devem coincidir e conter pelo menos 12 caracteres.',true);
+    if (pass.length<6 || pass!==form.elements.confirm.value) return msg(status,'As senhas devem coincidir e conter pelo menos 6 caracteres.',true);
     if (!conf.siteKey || !cloud.url || !cloud.publishableKey) return msg(status,'Cadastro não configurado para este ambiente.',true);
     const token = window.turnstile?.getResponse(captchaId);
     if (!token) return msg(status,'Conclua a validação antirrobô.',true);
@@ -122,7 +155,14 @@ if (trigger.textContent !== nextLabel) {
       });
       const body=await response.json().catch(()=>({}));
       msg(status,body.message||(response.ok?'Solicitação registrada.':'Não foi possível registrar.'),!response.ok);
-      if (response.ok) {form.reset();}
+      if (response.ok) {
+        form.reset();
+        for (const id of ['gv-reg-password', 'gv-reg-confirm']) {
+          const field = document.getElementById(id);
+          const eye = document.querySelector('[data-gv-password-eye="' + id + '"]');
+          setPasswordVisibility(field, eye, false);
+        }
+      }
     } catch (_e) {msg(status,'Não foi possível enviar a solicitação. Verifique sua conexão.',true);}
     finally {submit.disabled=false; if(window.turnstile&&captchaId!==null) window.turnstile.reset(captchaId);}
   }
@@ -211,6 +251,16 @@ if (trigger.textContent !== nextLabel) {
     finally {if(button)button.disabled=false;}
   }
   document.addEventListener('click',e=>{
+    const eye = e.target.closest('[data-gv-password-eye]');
+    if (eye) {
+      e.preventDefault();
+      const input = document.getElementById(eye.dataset.gvPasswordEye);
+      if (input) {
+        setPasswordVisibility(input, eye, input.type === 'password');
+        input.focus({preventScroll:true});
+      }
+      return;
+    }
     const trigger=e.target.closest('#gv-member-register-trigger');
     if(trigger){signupVisible=!signupVisible;mountLogin();return;}
     if(e.target.closest('#gv-members-signout')) {void getClient()?.auth.signOut().then(()=>location.reload());return;}
@@ -223,7 +273,7 @@ if (trigger.textContent !== nextLabel) {
   document.addEventListener('submit', e=>{
     if(e.target.id==='gv-members-signup-form'){e.preventDefault();void doSignup(e.target);}
   },true);
-  const hydrate=()=>{mountLogin();mountPending();mountAdmin();};
+  const hydrate=()=>{mountLogin();mountPasswordEyes();mountPending();mountAdmin();};
   const observer=new MutationObserver(hydrate);
   observer.observe(document.documentElement,{childList:true,subtree:true});
   document.addEventListener('DOMContentLoaded',hydrate);

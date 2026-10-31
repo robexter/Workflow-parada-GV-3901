@@ -1,0 +1,44 @@
+GV-3901 — ALTERAÇÃO DE SENHAS: MÍNIMO 6 + OLHINHO
+Homologação r7 — NÃO altera o documento funcional V1.2 congelado.
+
+ATENÇÃO: 6 caracteres é uma senha fraca para uso com informações operacionais;
+recomendamos senhas maiores (12+) especialmente para administradores.
+
+A) NO GITHUB (repositório robexter/homologacao-da-caldeira-)
+Faça backup ou use uma branch de homologação antes de substituir arquivos.
+Carregue SOMENTE ESTES TRÊS arquivos, preservando caminhos:
+  GITHUB/index.html                 => raiz /index.html
+  GITHUB/sw.js                      => raiz /sw.js
+  GITHUB/assets/membros-acesso.js   => /assets/membros-acesso.js
+Use o recurso de editar/substituir cada arquivo conforme caminho.
+Não copie a pasta 'GITHUB' para dentro do projeto; ela é só a organização do ZIP.
+Não altere assets/app.js, cloud-config.js, nem a V1.2 congelada.
+
+B) NO SUPABASE — OBRIGATÓRIO PARA SENHAS DE 6 CARACTERES
+No projeto xxmgogrxhavitzdwehzz, abra Edge Functions e a função:
+  gv3901-solicitar-acesso
+Edite index.ts e ajuste o requisito de 12 para 6 caracteres no backend.
+Arquivo de referência: SUPABASE/gv3901-solicitar-acesso/index.ts
+IMPORTANTE: antes de substituir todo o código, confira se o arquivo já implantado
+corresponde à versão anteriormente fornecida. Se tiver evoluído, altere APENAS
+as duas ocorrências: 'password.length<12' e mensagem 'mínimo 12 caracteres'.
+Faça Deploy/Deploy updates e confirme se a função continua com Turnstile ativo.
+Não publique nenhum Secret no GitHub nem desative RLS.
+
+C) SUPABASE AUTH
+Verifique em Authentication > Providers > Email / Password security (a localização pode variar)
+se o comprimento mínimo de senha do Supabase Auth permite 6 caracteres. Caso
+esteja definido acima de 6, o servidor continuará rejeitando essas senhas.
+Verifique eventuais requisitos adicionais de composição.
+
+D) TESTES DE HOMOLOGAÇÃO (sem dados operacionais reais)
+1. Abra o PWA em aba anônima no celular e confira o olhinho no login.
+2. Abra Solicitar acesso e confira olhinho em Senha e Confirme a senha.
+3. Senha com 5 caracteres deve ser recusada pelo formulário.
+4. Senha com 6 caracteres deve passar na interface e no backend (se conforme Auth).
+5. Ícone deve revelar e ocultar o texto, sem apagar a senha, em todos os 3 campos.
+6. Confirme que o cadastro fica pendente; Robson aprova ou recusa no fluxo normal.
+7. No celular com o PWA instalado, recarregue para atualizar o Service Worker r7.
+
+O botão do olhinho não envia nem armazena o texto da senha: somente alterna
+localmente o tipo do campo entre 'password' e 'text'. Use-o em ambiente privado.
