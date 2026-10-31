@@ -9,7 +9,7 @@
  */
 (() => {
   const CONFIG = Object.freeze({
-    domain: 'login.gv3901.example.com',
+    domain: 'gv3901-solicitar-acesso',
     allowLegacyEmail: true // Compatibilidade temporária com contas por e-mail já existentes.
   });
   const USERNAME = /^[a-z][a-z0-9._-]{2,31}$/;
