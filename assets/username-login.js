@@ -9,7 +9,7 @@
  */
 (() => {
   const CONFIG = Object.freeze({
-    domain: 'gv3901-solicitar-acesso',
+    domain: 'robexter.github.io',
     allowLegacyEmail: true // Compatibilidade temporária com contas por e-mail já existentes.
   });
   const USERNAME = /^[a-z][a-z0-9._-]{2,31}$/;
