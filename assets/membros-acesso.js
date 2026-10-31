@@ -54,7 +54,13 @@
     const signup = card.querySelector('#gv-member-signup');
     const trigger = card.querySelector('#gv-member-register-trigger');
     form.hidden=signupVisible; signup.hidden=!signupVisible;
-    trigger.textContent=signupVisible?'Voltar ao login':'Ainda não tenho cadastro — solicitar acesso';
+    const nextLabel = signupVisible
+  ? 'Voltar ao login'
+  : 'Ainda não tenho cadastro — solicitar acesso';
+
+if (trigger.textContent !== nextLabel) {
+  trigger.textContent = nextLabel;
+}
     if (signupVisible) mountCaptcha();
   }
   function mountCaptcha() {
