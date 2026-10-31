@@ -1,0 +1,17 @@
+{
+  "id":"./",
+  "name":"GV-3901 parada",
+  "short_name":"GV-3901 parada",
+  "description":"GV-3901: acompanhamento de manutenção com registros e Curva S",
+  "start_url":"./index.html",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#f2f6f9",
+  "theme_color":"#0d283b",
+  "icons":[
+    {"src":"./assets/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"./assets/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"./assets/icon-maskable-192.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
+    {"src":"./assets/icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ]
+}

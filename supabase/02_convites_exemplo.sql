@@ -1,0 +1,12 @@
+-- TEMPLATE de cadastro de usuários previamente criados em Supabase Auth.
+-- Não execute literalmente: substitua os UUIDs depois de criar convites/usuários no painel Auth.
+-- A conta do operador especial recebe seu nome real e UUID próprio.
+-- Em ambiente de teste autorizado:
+-- INSERT INTO public.gv3901_members (user_id,display_name,role,active)
+-- VALUES ('UUID_DE_ROBSON'::uuid,'Robson Almeida','admin',true);
+-- INSERT INTO public.gv3901_members (user_id,display_name,role,active)
+-- VALUES ('UUID_DE_PEDRO'::uuid,'Pedro Dantas','operator',true);
+-- INSERT INTO public.gv3901_members (user_id,display_name,role,active)
+-- VALUES ('UUID_DO_ESPECIAL'::uuid,'Nome do Operador Especial','operator',true);
+-- Revogar acesso (administrador no SQL Editor):
+-- UPDATE public.gv3901_members SET active=false WHERE user_id='UUID_DA_CONTA'::uuid;
