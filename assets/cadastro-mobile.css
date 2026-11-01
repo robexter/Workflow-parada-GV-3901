@@ -48,3 +48,84 @@
 #gv-captcha-feedback:empty{display:none;}
 #gv-captcha-retry{max-width:100%;min-height:44px;white-space:normal;line-height:1.4;margin-bottom:6px;}
 #gv-captcha-retry[hidden]{display:none!important;}
+
+/* r11 — campo único de identificação com nome longo e acentos */
+#gv-reg-user{width:100%;min-width:0;overflow-wrap:anywhere;}
+#gv-members-signup-form .gv-username-hint{font-size:12px;line-height:1.5;margin-bottom:9px;}
+
+/* r12 - Cloudflare Turnstile responsivo, SEM distorcer o desafio.
+ * O tamanho flexível é suportado nativamente pelo Cloudflare; o JavaScript
+ * seleciona compact se a LARGURA UTIL do formulário for menor que 300px.
+ * Não definir height fixa no iframe: desafios interativos podem mudar de altura.
+ */
+.cloud-login-layout,
+.cloud-login-card,
+#gv-member-signup,
+#gv-members-signup-form {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  box-sizing: border-box;
+}
+.cloud-login-layout,
+.cloud-login-card,
+#gv-member-signup {
+  overflow-x: clip;
+}
+#gv-member-signup #gv-turnstile {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 12px 0 8px !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  text-align: left;
+  overflow: visible;
+  height: auto;
+}
+#gv-member-signup #gv-turnstile > div,
+#gv-member-signup #gv-turnstile iframe {
+  max-width: 100% !important;
+  box-sizing: border-box;
+  border: 0;
+}
+/* O widget flexível ocupa a largura do campo, sem extrapolar laterais. */
+#gv-member-signup #gv-turnstile[data-gv-widget-size="flexible"] {
+  min-height: 65px !important;
+}
+#gv-member-signup #gv-turnstile[data-gv-widget-size="compact"] {
+  min-height: 140px !important;
+}
+#gv-member-signup #gv-turnstile[data-gv-widget-size="flexible"] > div,
+#gv-member-signup #gv-turnstile[data-gv-widget-size="flexible"] iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+/* Em telas realmente estreitas, compact tem largura nativa: não esticar iframe. */
+#gv-member-signup #gv-turnstile[data-gv-widget-size="compact"] {
+  display: flex !important;
+  justify-content: center;
+  align-items: flex-start;
+}
+#gv-member-signup #gv-turnstile[data-gv-widget-size="compact"] > div,
+#gv-member-signup #gv-turnstile[data-gv-widget-size="compact"] iframe {
+  max-width: 100% !important;
+}
+/* Ganhar largura útil no celular sem encostar nos limites do viewport. */
+@media (max-width: 540px) {
+  .cloud-login-layout { padding-inline: 4px !important; }
+  .cloud-login-card { padding-inline: 8px !important; }
+  #gv-member-signup { padding-inline: 8px !important; }
+}
+@media (max-width: 370px) {
+  .cloud-login-layout { padding-inline: 4px !important; }
+  .cloud-login-card { padding-inline: 6px !important; }
+  #gv-member-signup { padding-inline: 6px !important; }
+}
+#gv-captcha-feedback,
+#gv-captcha-retry,
+#gv-registration-message {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

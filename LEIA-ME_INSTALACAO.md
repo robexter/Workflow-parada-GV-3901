@@ -1,4 +1,37 @@
-# GV-3901 — Nome de usuário unificado r11
+# IMPORTANTE — r12 integra r11, não é uma versão paralela
+
+O pacote r12 contém todas as alterações r11 (campo único de usuário, SQL, login
+compatível, Edge Function) e a melhoria de responsividade do Turnstile.
+
+A captura mostrava "Nome de identificação" e o erro "3 a 32 caracteres":
+esses elementos pertencem a uma versão antiga. Portanto, publicar somente CSS
+não seria suficiente para ativar o nome de usuário unificado.
+
+Melhorias específicas r12:
+- Widget nativo do Cloudflare em modo `flexible` quando o formulário possui
+  pelo menos 304px disponíveis; caso contrário, modo `compact` (150px),
+  sem cortar conteúdo, distorcer a verificação ou forçar rolagem horizontal.
+- Seleção feita a partir da largura REAL disponível ao widget, não pelo viewport.
+- A largura flexível ocupa 100% do campo de cadastro, respeitando padding e margens.
+- Redimensionamentos que cruzam o limite mobile/compacto reinicializam o widget.
+- Não altera chaves, verificação antirrobô no servidor, ou a aprovação.
+
+**Se já executou o SQL e implantou a Edge Function da r11**, não precisa
+repeti-los: basta atualizar os 5 arquivos do GitHub abaixo:
+`index.html`, `sw.js`, `assets/membros-acesso.js`,
+`assets/username-login.js`, `assets/cadastro-mobile.css`.
+
+**Se ainda estiver na r9/r10**, siga a ordem completa de SQL, Edge Function,
+5 arquivos GitHub descrita abaixo. A tela antiga com dois campos prova que
+pelo menos a camada HTML/JS r11 não está refletida no navegador dessa captura.
+
+**ATENÇÃO**: Cloudflare controla o conteúdo interno do iframe. A aparência
+pode variar conforme o desafio; a mudança garante dimensionamento do contêiner,
+mas não altera o layout interno do Cloudflare.
+
+---
+
+# GV-3901 — Nome unificado + responsividade Cloudflare r12
 
 ## O que foi alterado
 - No cadastro, REMOVIDO o campo **Nome de identificação**.

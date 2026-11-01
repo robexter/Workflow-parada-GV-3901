@@ -12,6 +12,7 @@
   let captchaElement = null;
   let captchaWaitTimer = null;
   let captchaRendering = false;
+  let captchaResizeTimer = null;
   let adminBusy = false;
   let pendingStatusChecked = false;
   let listedMembers = [];
@@ -25,16 +26,17 @@
     }
     return client;
   };
-  const validName = s => /^[a-z][a-z0-9._-]{2,31}$/.test(s);
+  // Nome de usuário = nome de identificação; o servidor aplica a mesma normalização.
+  const normalizeName = s => String(s || '').normalize('NFC').trim().replace(/\s+/gu, ' ');
+  const validName = s => s.length >= 3 && s.length <= 120 && !/[\u0000-\u001f\u007f-\u009f]/u.test(s);
   const msg = (el,t,error=false) => { if (el) {el.textContent=t;el.style.color=error?'#bd3737':'#16765f';} };
   function signupMarkup() {
     return `<div id="gv-member-signup" class="gv-signup-panel" style="margin:16px 0 0;padding:16px;border:1px solid #c8d8e0;border-radius:13px">
       <h2 style="font-size:18px;margin:0 0 8px">Solicitar acesso à GV-3901</h2>
       <p class="muted gv-signup-intro">Preencha os dados abaixo. Seu acesso ficará pendente até a aprovação do administrador.</p>
       <form id="gv-members-signup-form" autocomplete="off">
-        <label for="gv-reg-name">Nome de identificação</label><input class="input" id="gv-reg-name" name="displayName" minlength="3" maxlength="120" required autocomplete="name" />
-        <label for="gv-reg-user">Nome de usuário (3 a 32 caracteres)</label><input class="input" id="gv-reg-user" name="username" minlength="3" maxlength="32" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" placeholder="Ex.: amanda01" />
-        <small class="gv-username-hint">Comece com uma letra. Use letras sem acento, números, ponto, hífen ou sublinhado. Não use espaços.</small>
+        <label for="gv-reg-user">Nome de usuário (3 a 120 caracteres)</label><input class="input" id="gv-reg-user" name="username" minlength="3" maxlength="120" required autocapitalize="words" autocorrect="off" spellcheck="false" autocomplete="name" placeholder="Ex.: João Carlos Almeida" />
+        <small class="gv-username-hint">Digite seu nome. Espaços e acentos são aceitos. Ele será utilizado automaticamente como nome de identificação e também no login.</small>
         <label for="gv-reg-password">Senha (mínimo 6 caracteres)</label><input class="input" type="password" id="gv-reg-password" name="password" minlength="6" maxlength="128" required autocomplete="new-password" />
         <label for="gv-reg-confirm">Confirme a senha</label><input class="input" type="password" id="gv-reg-confirm" name="confirm" minlength="6" maxlength="128" required autocomplete="new-password" />
         <div id="gv-turnstile" class="gv-signup-captcha" aria-label="Validação antirrobô"></div>
@@ -112,6 +114,28 @@ if (trigger.textContent !== nextLabel) {
     if (status && status.textContent !== message) msg(status, message, isError);
     if (retry && retry.hidden === isError) retry.hidden = !isError;
   }
+  // O widget flexible do Cloudflare exige largura disponível >= 300px.
+  // Ler o container real evita escolher o modo pelo tamanho total da tela.
+  function captchaSizeFor(element) {
+    const width = Math.floor(element.getBoundingClientRect().width ||
+      element.parentElement?.getBoundingClientRect().width || 0);
+    return width > 0 && width < 304 ? 'compact' : 'flexible';
+  }
+  function remountCaptchaForWidth() {
+    const el = document.getElementById('gv-turnstile');
+    if (!signupVisible || !el || !window.turnstile?.render) return;
+    const desired = captchaSizeFor(el);
+    if (!el.dataset.gvWidgetSize || desired === el.dataset.gvWidgetSize) return;
+    if (captchaId !== null && window.turnstile?.remove) {
+      try { window.turnstile.remove(captchaId); } catch (_e) {}
+    }
+    captchaId = null;
+    captchaElement = null;
+    delete el.dataset.rendered;
+    el.replaceChildren();
+    captchaNotice('Ajustando validação à largura da tela...');
+    mountCaptcha();
+  }
   function mountCaptcha() {
     const el = document.getElementById('gv-turnstile');
     if (!signupVisible || !el || !el.isConnected || captchaRendering) return;
@@ -141,11 +165,13 @@ if (trigger.textContent !== nextLabel) {
     captchaRendering=true;
     try {
       captchaElement=el;
+      const widgetSize = captchaSizeFor(el);
+      el.dataset.gvWidgetSize = widgetSize;
       captchaNotice('');
       const nextId=window.turnstile.render(el,{
         sitekey:conf.siteKey,
         theme:'auto',
-        size:window.matchMedia('(max-width: 370px)').matches?'compact':'flexible',
+        size:widgetSize,
         appearance:'always',
         retry:'auto',
         callback:()=>captchaNotice('Validação antirrobô concluída.'),
@@ -222,14 +248,14 @@ if (trigger.textContent !== nextLabel) {
   async function doSignup(form) {
     const status = document.getElementById('gv-registration-message');
     const submit = document.getElementById('gv-register-submit');
-    const u = String(form.elements.username.value).trim().toLowerCase();
-    const name = String(form.elements.displayName.value).trim();
+    const u = normalizeName(form.elements.username.value);
     const pass = String(form.elements.password.value);
     if (!validName(u)) {
-      msg(status,'Nome de usuário inválido (não a senha): comece com letra e use 3 a 32 caracteres sem espaços ou acentos.',true);
+      msg(status,'Nome de usuário inválido: use de 3 a 120 caracteres. Espaços e acentos são aceitos.',true);
       form.elements.username.focus();
       return;
     }
+    form.elements.username.value = u;
     if (pass.length<6 || pass!==form.elements.confirm.value) return msg(status,'As senhas devem coincidir e conter pelo menos 6 caracteres.',true);
     if (!conf.siteKey || !cloud.url || !cloud.publishableKey) return msg(status,'Cadastro não configurado para este ambiente.',true);
     let token = '';
@@ -245,7 +271,7 @@ if (trigger.textContent !== nextLabel) {
     try {
       const response = await fetch(`${cloud.url.replace(/\/$/,'')}/functions/v1/${conf.functionName||'gv3901-solicitar-acesso'}`,{
         method:'POST',headers:{'Content-Type':'application/json','apikey':cloud.publishableKey},
-        body:JSON.stringify({username:u,displayName:name,password:pass,captchaToken:token})
+        body:JSON.stringify({username:u,password:pass,captchaToken:token})
       });
       const body=await response.json().catch(()=>({}));
       msg(status,body.message||(response.ok?'Solicitação registrada.':'Não foi possível registrar.'),!response.ok);
@@ -475,6 +501,13 @@ if (trigger.textContent !== nextLabel) {
   document.addEventListener('submit', e=>{
     if(e.target.id==='gv-members-signup-form'){e.preventDefault();void doSignup(e.target);}
   },true);
+  window.addEventListener('resize', () => {
+    if (captchaResizeTimer !== null) window.clearTimeout(captchaResizeTimer);
+    captchaResizeTimer = window.setTimeout(() => {
+      captchaResizeTimer = null;
+      remountCaptchaForWidth();
+    }, 250);
+  });
   window.gv3901TurnstileReady = () => { mountCaptcha(); };
   const hydrate=()=>{mountLogin();mountPasswordEyes();mountPending();mountAdmin();};
   const observer=new MutationObserver(hydrate);
