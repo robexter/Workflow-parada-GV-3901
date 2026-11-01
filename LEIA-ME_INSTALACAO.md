@@ -1,31 +1,29 @@
-# GV-3901 — Correção do Primeiro Login r14
+# GV-3901 — Correção login direto r15
 
-## Problema confirmado
-No assets/username-login.js da versão r11, o botão de envio é desativado para aguardar o cálculo do e-mail técnico, mas o próprio código usa `form.requestSubmit()` com o botão ainda desabilitado. No Chromium isso impede a emissão do segundo evento de submit, e nenhum pedido de autenticação é feito. Um teste local reproduziu exatamente o problema.
+## Diagnóstico
+O usuário aprovado autenticou normalmente com seu e-mail técnico, mas não com o nome. O domínio técnico `robexter.github.io` foi confirmado. A r14 ainda usa interceptação de `submit` com reenvio (`requestSubmit`), sensível ao comportamento do navegador.
 
-## Alteração
-O botão permanece desativado enquanto o nome é convertido, mas é habilitado antes do `requestSubmit()`. O reenquadramento ocorre na tarefa seguinte, pois o Chromium não despacha um segundo `submit` enquanto o primeiro ainda está ativo. O campo visível é restaurado após o encaminhamento ao app.js. O restante do fluxo de autenticação, aprovação e autorização foi preservado.
+## Correção
+- O código r15 converte o nome informado para o mesmo identificador técnico usado na Edge Function r11, e chama `supabase.auth.signInWithPassword` DIRETAMENTE, sem tentar reenviar o formulário.
+- Ao receber uma sessão válida, recarrega a página. O `app.js` original recarrega a sessão e verifica `gv3901_members` e políticas RLS.
+- Mantém login por e-mail técnico para contas antigas/admins, sem converter o e-mail.
+- Melhora mensagens de erro sem revelar senha, e-mail completo ou detalhes de conta.
+- Preserva formulário/cadastro, Cloudflare Turnstile, aprovação administrativa, estrutura de dados e a especificação funcional congelada V1.2.
 
-## Arquivos (3 substituições)
-1. assets/username-login.js  => substituir no repositório /assets/
-2. index.html                => substituir na raiz (mantém referencias r13 dos demais scripts e incrementa somente a versão do login a r14)
-3. sw.js                     => substituir na raiz (troca cache r12 por r14)
+## Substituições GitHub (não mexer em outros arquivos)
+1. `assets/username-login.js` — substituir pelo fornecido.
+2. `index.html` — raiz; muda `username-login.js` r14 para r15.
+3. `sw.js` — raiz; atualiza o cache para r15.
 
-Não substituir assets/membros-acesso.js, assets/membros-config.js ou assets/app.js. Não alterar a Edge Function nem SQL apenas por causa desta falha de login.
+O código parte dos arquivos exatos publicados no GitHub na revisão r14, hashes previamente conferidos. **Não faça alterações no Supabase, nem exclua usuários.**
 
-## Publicação
-1. Faça backup dos três arquivos anteriores.
-2. Substitua no GitHub nos mesmos caminhos; confirme a publicação no GitHub Pages.
-3. Abra aba anônima no Chrome, acesse https://robexter.github.io/homologacao-da-caldeira-/?login=r14
-4. Faça login com o nome EXATAMENTE como foi cadastrado e a senha correspondente (sem compartilhá-la).
-5. Em caso de nova falha, verifique a mensagem exibida na tela e, no Supabase, Auth > Users e o domínio técnico do endereço de autenticação.
+## Teste
+1. Confirmar GitHub Pages com publicação concluída.
+2. Abrir guia anônima em `https://robexter.github.io/homologacao-da-caldeira-/?login=r15`.
+3. Informar o nome EXATAMENTE como no cadastro e a senha correspondente. Não informar a senha ao assistente.
+4. Confirmar que a página carrega com a permissão liberada após autenticação.
+5. Se houver mensagem "Nome de usuário ou senha não reconhecidos", confirmar, apenas no Supabase Authentication > Users, se o e-mail técnico daquela conta começa por `gv-` (nome completo) ou está no padrão antigo. Comparar o identificador calculado com o registrado sem divulgá-lo integralmente em público.
+6. Conta administrativa antiga com e-mail não derivado do nome continua podendo usar o próprio e-mail técnico.
 
-## Segunda verificação importante
-O front-end converte o nome para e-mail técnico no domínio `robexter.github.io`.
-O servidor de cadastro usa GV3901_USER_DOMAIN, que precisa coincidir com aquele domínio, ou o usuário já cadastrado precisa ter seu e-mail técnico igual ao gerado pelo front-end. Não altere nomes de usuário, e-mails de Auth ou segredos sem verificar os dados existentes.
-
-## Testes realizados
-- SHA Git blob dos arquivos originais conferidos contra a main atual.
-- Sintaxe JavaScript validada com node --check.
-- Comportamento de submit antes/depois testado em Chromium com Supabase simulado (sem dados reais).
-- Não houve publicação automática nem teste contra o projeto Supabase remoto.
+## Limitação
+Testes automatizados locais de DOM e autenticação simulada não substituem o teste real contra o Supabase. A conta real não foi acessada e a publicação no GitHub não é automática.
