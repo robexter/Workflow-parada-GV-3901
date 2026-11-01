@@ -23,7 +23,7 @@
   function signupMarkup() {
     return `<div id="gv-member-signup" style="margin:16px 0 0;padding:16px;border:1px solid #c8d8e0;border-radius:13px">
       <h2 style="font-size:18px;margin:0 0 8px">Solicitar acesso à GV-3901</h2>
-      <p class="muted" style="font-size:12px;line-height:1.55">Crie seu nome de usuário e sua senha. O acesso permanecerá bloqueado até aprovação de Robson. O perfil inicial será definido pelo administrador.</p>
+      <p class="muted" style="font-size:12px;line-height:1.55">Crie seu nome de usuário e sua senha. O acesso permanecerá bloqueado até aprovação do administrador.</p>
       <form id="gv-members-signup-form" autocomplete="off">
         <label for="gv-reg-name">Nome de identificação</label><input class="input" id="gv-reg-name" name="displayName" minlength="3" maxlength="120" required autocomplete="name" />
         <label for="gv-reg-user">Nome de usuário</label><input class="input" id="gv-reg-user" name="username" minlength="3" maxlength="32" required autocapitalize="none" autocomplete="off" placeholder="Ex.: operador01" />
