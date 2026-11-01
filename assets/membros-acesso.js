@@ -9,6 +9,9 @@
   let client;
   let signupVisible = false;
   let captchaId = null;
+  let captchaElement = null;
+  let captchaWaitTimer = null;
+  let captchaRendering = false;
   let adminBusy = false;
   let pendingStatusChecked = false;
   let listedMembers = [];
@@ -30,10 +33,13 @@
       <p class="muted gv-signup-intro">Preencha os dados abaixo. Seu acesso ficará pendente até a aprovação do administrador.</p>
       <form id="gv-members-signup-form" autocomplete="off">
         <label for="gv-reg-name">Nome de identificação</label><input class="input" id="gv-reg-name" name="displayName" minlength="3" maxlength="120" required autocomplete="name" />
-        <label for="gv-reg-user">Nome de usuário</label><input class="input" id="gv-reg-user" name="username" minlength="3" maxlength="32" required autocapitalize="none" autocomplete="off" placeholder="Ex.: operador01" />
+        <label for="gv-reg-user">Nome de usuário (3 a 32 caracteres)</label><input class="input" id="gv-reg-user" name="username" minlength="3" maxlength="32" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" placeholder="Ex.: amanda01" />
+        <small class="gv-username-hint">Comece com uma letra. Use letras sem acento, números, ponto, hífen ou sublinhado. Não use espaços.</small>
         <label for="gv-reg-password">Senha (mínimo 6 caracteres)</label><input class="input" type="password" id="gv-reg-password" name="password" minlength="6" maxlength="128" required autocomplete="new-password" />
         <label for="gv-reg-confirm">Confirme a senha</label><input class="input" type="password" id="gv-reg-confirm" name="confirm" minlength="6" maxlength="128" required autocomplete="new-password" />
         <div id="gv-turnstile" class="gv-signup-captcha" aria-label="Validação antirrobô"></div>
+        <p class="gv-captcha-feedback" id="gv-captcha-feedback" role="status" aria-live="polite"></p>
+        <button class="btn" id="gv-captcha-retry" type="button" hidden>Recarregar validação antirrobô</button>
         <div id="gv-registration-message" role="status" aria-live="polite" style="font-size:12px;margin:12px 0"></div>
         <button class="btn primary" type="submit" id="gv-register-submit">Solicitar cadastro</button>
       </form></div>`;
@@ -100,20 +106,93 @@ if (trigger.textContent !== nextLabel) {
 }
     if (signupVisible) mountCaptcha();
   }
+  function captchaNotice(message, isError=false) {
+    const status = document.getElementById('gv-captcha-feedback');
+    const retry = document.getElementById('gv-captcha-retry');
+    if (status && status.textContent !== message) msg(status, message, isError);
+    if (retry && retry.hidden === isError) retry.hidden = !isError;
+  }
   function mountCaptcha() {
     const el = document.getElementById('gv-turnstile');
-    if (!el || el.dataset.rendered) return;
+    if (!signupVisible || !el || !el.isConnected || captchaRendering) return;
     if (!conf.siteKey) {
-      msg(document.getElementById('gv-registration-message'),
-        'Cadastro ainda não habilitado: configure a chave pública Turnstile em assets/membros-config.js.',true);
+      captchaNotice('A validação antirrobô não está configurada. Contate a administração.',true);
       return;
     }
-    if (window.turnstile?.render) {
-      try {
-        captchaId=window.turnstile.render(el,{sitekey:conf.siteKey,theme:'auto',size:window.matchMedia('(max-width: 370px)').matches?'compact':'flexible'});
-        el.dataset.rendered='yes';
-      } catch (_e) {msg(document.getElementById('gv-registration-message'),'Falha ao carregar a validação antirrobô.',true);}
+    if (!window.turnstile || typeof window.turnstile.render !== 'function') {
+      if (captchaWaitTimer === null) {
+        captchaWaitTimer=window.setTimeout(() => {
+          captchaWaitTimer=null;
+          if (signupVisible && !window.turnstile?.render)
+            captchaNotice('Cloudflare não carregou. Verifique a conexão ou bloqueador de conteúdo e recarregue.',true);
+        },4000);
+      }
+      return;
     }
+    if (captchaWaitTimer !== null) {
+      window.clearTimeout(captchaWaitTimer);
+      captchaWaitTimer=null;
+    }
+    if (captchaElement === el && captchaId !== null) return;
+    if (captchaId !== null) {
+      try { window.turnstile.remove(captchaId); } catch (_e) {}
+      captchaId=null;
+    }
+    captchaRendering=true;
+    try {
+      captchaElement=el;
+      captchaNotice('');
+      const nextId=window.turnstile.render(el,{
+        sitekey:conf.siteKey,
+        theme:'auto',
+        size:window.matchMedia('(max-width: 370px)').matches?'compact':'flexible',
+        appearance:'always',
+        retry:'auto',
+        callback:()=>captchaNotice('Validação antirrobô concluída.'),
+        'error-callback':code=>{
+          console.warn('Erro Cloudflare Turnstile:',String(code));
+          captchaNotice('A validação falhou. Clique em Recarregar validação antirrobô.',true);
+          return true;
+        },
+        'expired-callback':()=>captchaNotice('A validação expirou. Recarregue o Cloudflare.',true),
+        'timeout-callback':()=>captchaNotice('Tempo esgotado. Recarregue a validação antirrobô.',true)
+      });
+      if (nextId === undefined || nextId === null) throw Error('widget não inicializado');
+      captchaId=nextId;
+      el.dataset.rendered='yes';
+    } catch (_e) {
+      captchaId=null;
+      captchaElement=null;
+      captchaNotice('Não foi possível iniciar o Cloudflare. Clique em Recarregar validação.',true);
+    } finally {
+      captchaRendering=false;
+    }
+  }
+  function retryCaptcha() {
+    if (window.turnstile?.reset && captchaId !== null) {
+      try {
+        window.turnstile.reset(captchaId);
+        captchaNotice('Validação reiniciada.');
+        return;
+      } catch (_e) {}
+    }
+    if (window.turnstile?.remove && captchaId !== null) {
+      try { window.turnstile.remove(captchaId); } catch (_e) {}
+    }
+    captchaId=null;
+    captchaElement=null;
+    const el=document.getElementById('gv-turnstile');
+    if(el) el.replaceChildren();
+    captchaNotice('Carregando validação...');
+    if (window.turnstile?.render) {
+      mountCaptcha();
+      return;
+    }
+    const script=document.createElement('script');
+    script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=gv3901TurnstileReady';
+    script.async=true;
+    script.onerror=()=>captchaNotice('O Cloudflare não carregou. Verifique conexão, bloqueador de conteúdo ou DNS.',true);
+    document.head.appendChild(script);
   }
   function mountPending() {
     const card = document.querySelector('.cloud-login-card');
@@ -146,11 +225,22 @@ if (trigger.textContent !== nextLabel) {
     const u = String(form.elements.username.value).trim().toLowerCase();
     const name = String(form.elements.displayName.value).trim();
     const pass = String(form.elements.password.value);
-    if (!validName(u)) return msg(status,'Usuário deve começar com letra e ter de 3 a 32 caracteres.',true);
+    if (!validName(u)) {
+      msg(status,'Nome de usuário inválido (não a senha): comece com letra e use 3 a 32 caracteres sem espaços ou acentos.',true);
+      form.elements.username.focus();
+      return;
+    }
     if (pass.length<6 || pass!==form.elements.confirm.value) return msg(status,'As senhas devem coincidir e conter pelo menos 6 caracteres.',true);
     if (!conf.siteKey || !cloud.url || !cloud.publishableKey) return msg(status,'Cadastro não configurado para este ambiente.',true);
-    const token = window.turnstile?.getResponse(captchaId);
-    if (!token) return msg(status,'Conclua a validação antirrobô.',true);
+    let token = '';
+    if (captchaId !== null && captchaElement === document.getElementById('gv-turnstile')) {
+      try { token = window.turnstile?.getResponse(captchaId) || ''; } catch (_e) {}
+    }
+    if (!token) {
+      mountCaptcha();
+      captchaNotice('A validação antirrobô não foi concluída ou expirou. Recarregue a validação.',true);
+      return msg(status,'Conclua a validação antirrobô antes de solicitar o cadastro.',true);
+    }
     submit.disabled=true; msg(status,'Enviando solicitação...');
     try {
       const response = await fetch(`${cloud.url.replace(/\/$/,'')}/functions/v1/${conf.functionName||'gv3901-solicitar-acesso'}`,{
@@ -347,6 +437,7 @@ if (trigger.textContent !== nextLabel) {
     finally {if(button)button.disabled=false;}
   }
   document.addEventListener('click',e=>{
+    if (e.target.closest('#gv-captcha-retry')) {e.preventDefault();retryCaptcha();return;}
     const eye = e.target.closest('[data-gv-password-eye]');
     if (eye) {
       e.preventDefault();
@@ -384,6 +475,7 @@ if (trigger.textContent !== nextLabel) {
   document.addEventListener('submit', e=>{
     if(e.target.id==='gv-members-signup-form'){e.preventDefault();void doSignup(e.target);}
   },true);
+  window.gv3901TurnstileReady = () => { mountCaptcha(); };
   const hydrate=()=>{mountLogin();mountPasswordEyes();mountPending();mountAdmin();};
   const observer=new MutationObserver(hydrate);
   observer.observe(document.documentElement,{childList:true,subtree:true});

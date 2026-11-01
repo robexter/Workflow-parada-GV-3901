@@ -41,3 +41,10 @@
   .cloud-login-card {padding:8px 6px;}
   #gv-member-signup {padding:6px !important;}
 }
+
+/* r10 — ajuda de usuário e recuperação do Turnstile. */
+#gv-members-signup-form .gv-username-hint{display:block;margin:3px 0 7px;color:#526d7c;font-size:12px;line-height:1.4;overflow-wrap:anywhere;}
+#gv-captcha-feedback{font-size:12px;line-height:1.45;margin:5px 0;overflow-wrap:anywhere;}
+#gv-captcha-feedback:empty{display:none;}
+#gv-captcha-retry{max-width:100%;min-height:44px;white-space:normal;line-height:1.4;margin-bottom:6px;}
+#gv-captcha-retry[hidden]{display:none!important;}
