@@ -1,8 +1,8 @@
 /* GV-3901 / HOMOLOGAÇÃO: não cachear configuração nem credenciais Supabase. */
-const CACHE = 'gv3901-v1-1-homologacao-planejamento-r18';
+const CACHE = 'gv3901-v1-1-homologacao-gravacao-r19';
 const SHELL = [
   './', './index.html', './assets/app.js', './assets/username-login.js',
-  './assets/membros-acesso.js', './assets/atividade-diagnostico-r18.js',
+  './assets/membros-acesso.js', './assets/atividade-gravacao-r19.js',
   './assets/styles.css', './assets/cadastro-mobile.css', './manifest.webmanifest',
   './assets/icon-192.png', './assets/icon-512.png',
   './assets/icon-maskable-192.png', './assets/icon-maskable-512.png',
