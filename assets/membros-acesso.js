@@ -11,6 +11,10 @@
   let captchaId = null;
   let adminBusy = false;
   let pendingStatusChecked = false;
+  let listedMembers = [];
+  let memberSearch = '';
+  let memberStatus = 'all';
+  let memberPageSize = 12;
   const getClient = () => {
     if (!client && cloud.url && cloud.publishableKey && window.supabase?.createClient) {
       client = window.supabase.createClient(cloud.url,cloud.publishableKey,
@@ -21,15 +25,15 @@
   const validName = s => /^[a-z][a-z0-9._-]{2,31}$/.test(s);
   const msg = (el,t,error=false) => { if (el) {el.textContent=t;el.style.color=error?'#bd3737':'#16765f';} };
   function signupMarkup() {
-    return `<div id="gv-member-signup" style="margin:16px 0 0;padding:16px;border:1px solid #c8d8e0;border-radius:13px">
+    return `<div id="gv-member-signup" class="gv-signup-panel" style="margin:16px 0 0;padding:16px;border:1px solid #c8d8e0;border-radius:13px">
       <h2 style="font-size:18px;margin:0 0 8px">Solicitar acesso à GV-3901</h2>
-      <p class="muted" style="font-size:12px;line-height:1.55">Crie seu nome de usuário e sua senha. O acesso permanecerá bloqueado até aprovação do administrador.</p>
+      <p class="muted gv-signup-intro">Preencha os dados abaixo. Seu acesso ficará pendente até a aprovação do administrador.</p>
       <form id="gv-members-signup-form" autocomplete="off">
         <label for="gv-reg-name">Nome de identificação</label><input class="input" id="gv-reg-name" name="displayName" minlength="3" maxlength="120" required autocomplete="name" />
         <label for="gv-reg-user">Nome de usuário</label><input class="input" id="gv-reg-user" name="username" minlength="3" maxlength="32" required autocapitalize="none" autocomplete="off" placeholder="Ex.: operador01" />
         <label for="gv-reg-password">Senha (mínimo 6 caracteres)</label><input class="input" type="password" id="gv-reg-password" name="password" minlength="6" maxlength="128" required autocomplete="new-password" />
         <label for="gv-reg-confirm">Confirme a senha</label><input class="input" type="password" id="gv-reg-confirm" name="confirm" minlength="6" maxlength="128" required autocomplete="new-password" />
-        <div id="gv-turnstile" style="margin:14px 0;max-width:100%;overflow:hidden"></div>
+        <div id="gv-turnstile" class="gv-signup-captcha" aria-label="Validação antirrobô"></div>
         <div id="gv-registration-message" role="status" aria-live="polite" style="font-size:12px;margin:12px 0"></div>
         <button class="btn primary" type="submit" id="gv-register-submit">Solicitar cadastro</button>
       </form></div>`;
@@ -106,7 +110,7 @@ if (trigger.textContent !== nextLabel) {
     }
     if (window.turnstile?.render) {
       try {
-        captchaId=window.turnstile.render(el,{sitekey:conf.siteKey,theme:'auto'});
+        captchaId=window.turnstile.render(el,{sitekey:conf.siteKey,theme:'auto',size:window.matchMedia('(max-width: 370px)').matches?'compact':'flexible'});
         el.dataset.rendered='yes';
       } catch (_e) {msg(document.getElementById('gv-registration-message'),'Falha ao carregar a validação antirrobô.',true);}
     }
@@ -166,11 +170,53 @@ if (trigger.textContent !== nextLabel) {
     } catch (_e) {msg(status,'Não foi possível enviar a solicitação. Verifique sua conexão.',true);}
     finally {submit.disabled=false; if(window.turnstile&&captchaId!==null) window.turnstile.reset(captchaId);}
   }
+  // Apresentação da Área de Membros; não altera a autorização no servidor.
+  const memberUiCss = `<style>
+    #gv-area-membros, #gv-area-membros * {box-sizing:border-box}
+    #gv-area-membros {width:100%;max-width:100%;overflow:hidden}
+    #gv-area-membros .gv-members-head {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+    #gv-area-membros .gv-members-head h2 {margin:0;font-size:clamp(17px,3.5vw,22px);line-height:1.25}
+    #gv-area-membros .gv-members-help {margin:6px 0 0;color:#627b89;font-size:12px}
+    #gv-area-membros .gv-member-stats {display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px}
+    #gv-area-membros .gv-member-stat {border:1px solid #d7e5ea;border-radius:9px;padding:8px 11px;font-size:12px;background:#f6fafb}
+    #gv-area-membros .gv-member-stat strong {font-variant-numeric:tabular-nums}
+    #gv-area-membros .gv-members-tools {display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,200px);gap:10px;margin:12px 0 14px}
+    #gv-area-membros .gv-members-tools .input {min-width:0;width:100%;max-width:100%;margin:0}
+    #gv-area-membros .gv-members-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px;min-width:0}
+    #gv-area-membros .gv-member-item {min-width:0;max-width:100%;padding:13px;border:1px solid #d7e5ea;border-radius:12px;background:#fff}
+    #gv-area-membros .gv-member-title {display:flex;flex-wrap:wrap;justify-content:space-between;align-items:start;gap:8px}
+    #gv-area-membros .gv-member-name {font-size:14px;font-weight:700;line-height:1.4;overflow-wrap:anywhere}
+    #gv-area-membros .gv-member-user {font-size:12px;color:#627b89;overflow-wrap:anywhere}
+    #gv-area-membros .gv-member-status {display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;background:#eaf2f7;color:#23485d;font-size:11px;font-weight:600;white-space:normal}
+    #gv-area-membros .gv-member-status.pending {background:#fff5db;color:#785000}
+    #gv-area-membros .gv-member-status.active {background:#e7f5ed;color:#175f3e}
+    #gv-area-membros .gv-member-status.suspended {background:#fbecec;color:#963535}
+    #gv-area-membros .gv-member-meta {font-size:12px;color:#516a78;margin:10px 0}
+    #gv-area-membros .gv-member-actions {display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+    #gv-area-membros .gv-member-actions .input {width:100%;min-width:0;max-width:100%;margin:0}
+    #gv-area-membros .gv-member-actions .btn {flex:1 1 110px;min-width:0;white-space:normal;text-align:center;justify-content:center}
+    #gv-area-membros .gv-member-actions .gv-member-role {flex:1 1 100%;min-width:0}
+    #gv-area-membros .gv-members-bottom {display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+    #gv-area-membros .gv-members-bottom .btn {white-space:normal}
+    #gv-area-membros .gv-member-help-details, #gv-area-membros .gv-member-audit {margin-top:12px;border-top:1px solid #d7e5ea;padding-top:12px}
+    #gv-area-membros summary {cursor:pointer;font-weight:600;overflow-wrap:anywhere}
+    #gv-area-membros .gv-member-audit-row {border-bottom:1px solid #e1eaf0;padding:9px 0;overflow-wrap:anywhere;font-size:12px}
+    #gv-area-membros .gv-member-operation {font-size:12px;overflow-wrap:anywhere;min-height:1em;margin:10px 0 0}
+    #gv-area-membros .gv-members-empty {padding:22px 10px;color:#627b89;text-align:center}
+    @media(max-width:580px){
+      #gv-area-membros {padding:14px 12px!important}
+      #gv-area-membros .gv-members-tools {grid-template-columns:minmax(0,1fr)}
+      #gv-area-membros .gv-member-stat {flex:1 1 120px}
+      #gv-area-membros .gv-members-list {grid-template-columns:minmax(0,1fr)}
+      #gv-area-membros .gv-member-actions .btn {flex:1 1 125px}
+    }
+  </style>`;
   function memberCard() {
-    return `<section class="card pad" id="gv-area-membros" style="margin:16px 0;min-width:0">
-      <div class="section-head"><h2>Área de Membros · Aprovações e perfis</h2></div>
-      <p class="muted" style="font-size:12px;margin-bottom:12px">Solicitações de novos usuários e alteração de leitura/escrita. Ações administrativas são auditadas no Supabase.</p>
-      <div id="gv-area-membros-body" role="status" aria-live="polite">Verificando permissão...</div>
+    return `<section class="card pad" id="gv-area-membros" style="margin:16px 0;min-width:0;max-width:100%">
+      ${memberUiCss}
+      <div class="gv-members-head"><h2>Área de Membros</h2></div>
+      <p class="gv-members-help">Aprovação e permissões de acesso</p>
+      <div id="gv-area-membros-body" aria-live="polite">Verificando permissão...</div>
     </section>`;
   }
   function mountAdmin() {
@@ -179,9 +225,50 @@ if (trigger.textContent !== nextLabel) {
     if (!workspace || workspace.querySelector('#gv-area-membros')) return;
     const el=document.createElement('div'); el.innerHTML=memberCard();
     const card=el.firstElementChild;
-    const grid = workspace.querySelector('.grid.half');
+    const grid=workspace.querySelector('.grid.half');
     if(grid) grid.insertAdjacentElement('beforebegin',card); else workspace.appendChild(card);
     void loadAdmin(card);
+  }
+  function renderMemberRows() {
+    const list = document.getElementById('gv-members-list');
+    const count = document.getElementById('gv-members-result-count');
+    const more = document.getElementById('gv-members-more');
+    if (!list) return;
+    const search = memberSearch.trim().toLocaleLowerCase('pt-BR');
+    const matched = listedMembers.filter(m => {
+      const pending = !m.active && !m.approved_at;
+      const status = pending ? 'pending' : m.active ? 'active' : 'suspended';
+      if (memberStatus !== 'all' && memberStatus !== status) return false;
+      return !search || `${m.display_name||''} ${m.username||''}`.toLocaleLowerCase('pt-BR').includes(search);
+    });
+    // Pendências primeiro, seguido de usuários conforme ordenação do servidor.
+    matched.sort((a,b)=>Number(!b.active&&!b.approved_at)-Number(!a.active&&!a.approved_at));
+    const visible = matched.slice(0,memberPageSize);
+    list.innerHTML=visible.map(m => {
+      const privileged=['admin','planner'].includes(m.role);
+      const pending=!m.active&&!m.approved_at;
+      const status=pending?'Pendente':m.active?'Liberado':'Suspenso';
+      const kind=pending?'pending':m.active?'active':'suspended';
+      return `<article class="gv-member-item">
+        <div class="gv-member-title"><div style="min-width:0;flex:1">
+          <div class="gv-member-name">${escapeHtml(m.display_name)}</div>
+          <div class="gv-member-user">@${escapeHtml(m.username||'conta-antiga')}</div>
+        </div><span class="gv-member-status ${kind}">${status}</span></div>
+        <div class="gv-member-meta">Perfil: <strong>${escapeHtml(m.role)}</strong></div>
+        ${privileged ? '<div class="gv-member-meta">Perfil administrativo protegido</div>' :
+          `<div class="gv-member-actions">
+            <div class="gv-member-role"><label for="gv-member-role-${escapeHtml(m.user_id)}" style="display:block;font-size:12px;margin-bottom:4px">Permissão</label>
+            <select id="gv-member-role-${escapeHtml(m.user_id)}" class="input" data-gv-member-select="${escapeHtml(m.user_id)}">
+              <option value="viewer" ${m.role==='viewer'?'selected':''}>Somente leitura</option>
+              <option value="operator" ${m.role==='operator'?'selected':''}>Escrita operacional</option>
+            </select></div>
+            <button type="button" class="btn primary" data-gv-member-set="${escapeHtml(m.user_id)}">${pending?'Aprovar':'Salvar perfil'}</button>
+            ${m.active?`<button type="button" class="btn" data-gv-member-suspend="${escapeHtml(m.user_id)}">Suspender</button>`:''}
+          </div>`}
+      </article>`;
+    }).join('') || '<div class="gv-members-empty">Nenhum membro encontrado para este filtro.</div>';
+    if(count) count.textContent=`Mostrando ${visible.length} de ${matched.length}`;
+    if(more) more.hidden=visible.length>=matched.length;
   }
   async function loadAdmin(card) {
     if (adminBusy) return;
@@ -196,37 +283,46 @@ if (trigger.textContent !== nextLabel) {
       if(meError||!me) throw Error('Cadastro não encontrado.');
       if(!me.active) throw Error('Aguardando autorização do administrador.');
       if(!me.can_manage_members || me.role!=='admin') {
-        body.innerHTML=`<p><strong>Seu perfil atual:</strong> ${escapeHtml(me.role==='viewer'?'Somente leitura':me.role==='operator'?'Edição de registros':me.role)}</p><p class="muted">Mudanças de perfil e liberação de novos membros são feitas por Robson.</p>`;
+        body.innerHTML=`<p style="overflow-wrap:anywhere"><strong>Seu perfil:</strong> ${escapeHtml(me.role==='viewer'?'Somente leitura':me.role==='operator'?'Escrita operacional':me.role)}</p><p class="gv-members-help">A gestão das permissões é exclusiva da administração.</p>`;
         return;
       }
       const {data:members,error:membersError}=await sb.from('gv3901_members')
         .select('user_id,username,display_name,role,active,approved_at,requested_at')
         .order('requested_at',{ascending:false}).limit(500);
       if(membersError) throw membersError;
-      const pending=(members||[]).filter(m=>!m.active&&!m.approved_at).length;
-      const rows=(members||[]).map(m=>{
-        const privileged=['admin','planner'].includes(m.role);
-        const pendingAccess=!m.active&&!m.approved_at;
-        const status=pendingAccess?'Aguardando aprovação':m.active?'Liberado':'Suspenso';
-        return `<tr><td><strong>${escapeHtml(m.display_name)}</strong><br><small>${escapeHtml(m.username||'Conta antiga')}</small></td>
-          <td>${status}</td><td>${escapeHtml(m.role)}</td><td style="min-width:220px">
-          ${privileged?'<small>Perfil protegido</small>':`<div style="display:flex;flex-wrap:wrap;gap:6px">
-          <select class="input" aria-label="Acesso para ${escapeHtml(m.username)}" data-gv-member-select="${escapeHtml(m.user_id)}" style="width:auto;max-width:150px">
-          <option value="viewer" ${m.role==='viewer'?'selected':''}>Somente leitura</option>
-          <option value="operator" ${m.role==='operator'?'selected':''}>Escrita operacional</option></select>
-          <button type="button" class="btn primary" data-gv-member-set="${escapeHtml(m.user_id)}">${pendingAccess?'Aprovar':'Salvar perfil'}</button>
-          ${m.active?`<button type="button" class="btn" data-gv-member-suspend="${escapeHtml(m.user_id)}">Suspender</button>`:''}</div>`}</td></tr>`;
-      }).join('');
-      body.innerHTML=`<p><strong>${pending} solicitação(ões) pendente(s)</strong> · ${members.length} usuários listados</p>
-        <p class="muted" style="font-size:12px">Escolha leitura ou escrita e confirme. Para uma liberação temporária, retorne posteriormente e escolha “Somente leitura”. Administradores não podem alterar o próprio acesso nesta tela.</p>
-        <div style="overflow-x:auto"><table class="table"><thead><tr><th>Membro</th><th>Status</th><th>Perfil atual</th><th>Gerenciar</th></tr></thead><tbody>${rows||'<tr><td colspan="4">Nenhum membro cadastrado.</td></tr>'}</tbody></table></div>
-        <p id="gv-member-operation" aria-live="polite" style="font-size:12px;margin-top:12px"></p>
-        <button type="button" class="btn" id="gv-members-refresh" style="margin-top:10px">Atualizar lista</button>
-        <details style="margin-top:14px"><summary>Histórico de alterações de acesso</summary><div id="gv-access-history">Carregando...</div></details>`;
+      listedMembers=members||[];
+      const pending=listedMembers.filter(m=>!m.active&&!m.approved_at).length;
+      const active=listedMembers.filter(m=>m.active).length;
+      body.innerHTML=`<div class="gv-member-stats">
+        <span class="gv-member-stat"><strong>${pending}</strong> pendentes</span>
+        <span class="gv-member-stat"><strong>${active}</strong> liberados</span>
+        <span class="gv-member-stat"><strong>${listedMembers.length}</strong> no total</span>
+      </div>
+      <div class="gv-members-tools">
+        <input id="gv-member-search" class="input" type="search" placeholder="Buscar nome ou usuário" aria-label="Buscar membro" value="${escapeHtml(memberSearch)}" autocomplete="off">
+        <select id="gv-member-status" class="input" aria-label="Filtrar status">
+          <option value="all" ${memberStatus==='all'?'selected':''}>Todos os status</option>
+          <option value="pending" ${memberStatus==='pending'?'selected':''}>Pendentes</option>
+          <option value="active" ${memberStatus==='active'?'selected':''}>Liberados</option>
+          <option value="suspended" ${memberStatus==='suspended'?'selected':''}>Suspensos</option>
+        </select>
+      </div>
+      <div id="gv-members-list" class="gv-members-list"></div>
+      <p id="gv-member-operation" class="gv-member-operation" role="status" aria-live="polite"></p>
+      <div class="gv-members-bottom">
+        <span id="gv-members-result-count" class="gv-members-help"></span>
+        <button type="button" class="btn" id="gv-members-more">Ver mais membros</button>
+        <button type="button" class="btn" id="gv-members-refresh">Atualizar</button>
+      </div>
+      <details class="gv-member-help-details"><summary>Como gerenciar permissões</summary>
+        <p class="gv-members-help">Selecione leitura ou escrita e toque em Aprovar ou Salvar perfil. Para suspender, use Suspender. Justifique toda alteração; a ação será auditada. Perfis administrativos estão protegidos.</p>
+      </details>
+      <details class="gv-member-audit"><summary>Histórico de alterações de acesso</summary><div id="gv-access-history">Carregando...</div></details>`;
+      renderMemberRows();
       const {data:history,error:historyError} = await sb.rpc('gv3901_access_history',{p_limit:30});
       const historyBox=card.querySelector('#gv-access-history');
       if(historyBox) historyBox.innerHTML=historyError?'Histórico indisponível.':(history||[]).map(h=>
-        `<div style="border-bottom:1px solid #ddd;padding:8px 0"><strong>${escapeHtml(h.target_name)}</strong>: ${escapeHtml(h.old_role)} → ${escapeHtml(h.new_role)}
+        `<div class="gv-member-audit-row"><strong>${escapeHtml(h.target_name)}</strong>: ${escapeHtml(h.old_role)} → ${escapeHtml(h.new_role)}
         <small> por ${escapeHtml(h.actor_name)} · ${escapeHtml(h.changed_at)} </small><p>${escapeHtml(h.reason)}</p></div>`).join('')||'Sem alterações registradas.';
     } catch (error) {if(body) msg(body,'Área de Membros indisponível: '+String(error.message||'erro'),true);}
     finally {adminBusy=false;}
@@ -268,7 +364,22 @@ if (trigger.textContent !== nextLabel) {
     if(target){const id=target.dataset.gvMemberSet||target.dataset.gvMemberSuspend;
       const action=target.dataset.gvMemberSuspend?'suspend':document.querySelector(`[data-gv-member-select="${id}"]`)?.value;
       if(id && action)void changeMember(id,action);return;}
-    if(e.target.closest('#gv-members-refresh')) {const panel=document.getElementById('gv-area-membros');if(panel)void loadAdmin(panel);}
+    if(e.target.closest('#gv-members-more')) {memberPageSize+=12;renderMemberRows();return;}
+    if(e.target.closest('#gv-members-refresh')) {const panel=document.getElementById('gv-area-membros');if(panel)void loadAdmin(panel);return;}
+  });
+  document.addEventListener('input',e=>{
+    if(e.target.id==='gv-member-search') {
+      memberSearch=e.target.value;
+      memberPageSize=12;
+      renderMemberRows();
+    }
+  });
+  document.addEventListener('change',e=>{
+    if(e.target.id==='gv-member-status') {
+      memberStatus=e.target.value;
+      memberPageSize=12;
+      renderMemberRows();
+    }
   });
   document.addEventListener('submit', e=>{
     if(e.target.id==='gv-members-signup-form'){e.preventDefault();void doSignup(e.target);}

@@ -1,9 +1,9 @@
 /* GV-3901 / HOMOLOGAÇÃO: não cachear configuração nem credenciais Supabase. */
-const CACHE = 'gv3901-v1-1-homologacao-membros-r7';
+const CACHE = 'gv3901-v1-1-homologacao-membros-r9';
 const SHELL = [
   './', './index.html', './assets/app.js', './assets/username-login.js',
   './assets/membros-acesso.js',
-  './assets/styles.css', './manifest.webmanifest',
+  './assets/styles.css', './assets/cadastro-mobile.css', './manifest.webmanifest',
   './assets/icon-192.png', './assets/icon-512.png',
   './assets/icon-maskable-192.png', './assets/icon-maskable-512.png',
   './assets/apple-touch-icon.png'

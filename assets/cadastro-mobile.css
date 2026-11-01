@@ -1,0 +1,43 @@
+/* GV-3901 — Homologação r9: formulário de cadastro responsivo.
+ * CSS isolado; não modifica RLS, autenticação ou os módulos operacionais.
+ */
+.cloud-login-layout {min-width:0;width:100%;max-width:100%;}
+.cloud-login-card {min-width:0;width:100%;max-width:490px;}
+.cloud-login-card, #gv-member-signup, #gv-members-signup-form {box-sizing:border-box;}
+#gv-member-signup {width:100%;max-width:100%;min-width:0;overflow-wrap:anywhere;}
+#gv-member-signup[hidden], #cloud-login-form[hidden] {display:none !important;}
+#gv-member-signup h2 {font-size:clamp(17px,4.6vw,20px);line-height:1.25;overflow-wrap:anywhere;}
+#gv-member-signup .gv-signup-intro {font-size:13px !important;line-height:1.5 !important;margin:5px 0 9px !important;color:#526f7d;}
+#gv-members-signup-form {display:grid;grid-template-columns:minmax(0,1fr);width:100%;max-width:100%;min-width:0;gap:0;}
+#gv-members-signup-form label {font-size:13px;line-height:1.35;margin:11px 0 5px;overflow-wrap:anywhere;}
+#gv-members-signup-form .input {display:block;width:100%;max-width:100%;min-width:0;min-height:46px;padding:10px 12px;font-size:16px;line-height:1.35;box-sizing:border-box;border-radius:10px;}
+#gv-members-signup-form .input:focus {scroll-margin-block:24px;}
+#gv-members-signup-form div:has(> input[data-gv-eye-ready]) {max-width:100%;min-width:0;}
+#gv-members-signup-form [data-gv-password-eye] {min-width:44px;min-height:44px;touch-action:manipulation;}
+#gv-member-register-trigger {display:block;width:100% !important;max-width:100%;min-height:44px;white-space:normal;text-align:center;line-height:1.4;overflow-wrap:anywhere;}
+#gv-register-submit {display:flex;width:100%;max-width:100%;min-height:48px;padding:12px 16px;align-items:center;justify-content:center;white-space:normal;line-height:1.35;touch-action:manipulation;}
+#gv-registration-message {width:100%;max-width:100%;min-width:0;overflow-wrap:anywhere;line-height:1.45;font-size:13px !important;}
+#gv-turnstile {display:flex;justify-content:flex-start;align-items:center;width:100%;max-width:100%;min-width:0;min-height:65px;margin:12px 0 !important;overflow:visible;}
+#gv-turnstile iframe {max-width:100%;}
+@media (max-width:540px) {
+  .cloud-login-layout {padding:10px 8px calc(28px + env(safe-area-inset-bottom));align-items:start;place-items:start center;min-height:100svh;width:100%;}
+  .cloud-login-card {width:100%;max-width:470px;padding:16px 14px;border-radius:15px;}
+  .cloud-login-card .cloud-mark {width:43px;height:43px;margin-bottom:10px;border-radius:10px;font-size:17px;}
+  .cloud-login-card h1 {font-size:clamp(22px,6vw,29px);line-height:1.15;margin:7px 0 9px;}
+  .cloud-login-card > p {font-size:12px;line-height:1.45;margin-bottom:12px;}
+  .cloud-login-card .cloud-alert {font-size:12px;line-height:1.4;margin:12px 0;padding:10px 11px;overflow-wrap:anywhere;}
+  .cloud-login-card:has(#gv-member-signup:not([hidden])) > p:first-of-type {display:none;}
+  #gv-member-signup {padding:12px !important;margin:12px 0 0 !important;border-radius:12px !important;}
+  #gv-members-signup-form label {margin:9px 0 4px;}
+  #gv-members-signup-form .input {min-height:46px;}
+}
+@media (max-width:370px) {
+  .cloud-login-layout {padding:6px 5px calc(20px + env(safe-area-inset-bottom));}
+  .cloud-login-card {padding:12px 10px;border-radius:12px;}
+  #gv-member-signup {padding:9px !important;}
+  #gv-turnstile {min-height:140px;}
+}
+@media (max-width:300px) {
+  .cloud-login-card {padding:8px 6px;}
+  #gv-member-signup {padding:6px !important;}
+}
