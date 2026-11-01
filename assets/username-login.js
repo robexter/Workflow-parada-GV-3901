@@ -1,5 +1,5 @@
 'use strict';
-/* GV-3901 Homologação r11 — login por nome completo, preservando nomes antigos.
+/* GV-3901 Homologação r14 — login por nome completo, preservando nomes antigos.
  * A conversão gera somente um identificador técnico interno para Supabase Auth.
  * Não armazena senha ou hashes em navegador, nem modifica os módulos operacionais.
  */
@@ -73,6 +73,14 @@
         if (!form.isConnected) return;
         field.value = email;
         form.dataset.gv3901Prepared = 'yes';
+        // IMPORTANTE: requestSubmit() não dispara o submit com o botão
+        // desabilitado em alguns navegadores, inclusive no Chromium.
+        // Reabilitar somente após concluir a conversão do identificador.
+        if (submitButton) submitButton.disabled = false;
+        // Esperar o fim da tarefa atual: o Chromium bloqueia reenvios
+        // enquanto o evento submit original ainda está em processamento.
+        await new Promise(resolve => setTimeout(resolve, 0));
+        if (!form.isConnected) return;
         try { form.requestSubmit(); }
         finally { field.value = raw; delete form.dataset.gv3901Prepared; }
       } catch (error) {
