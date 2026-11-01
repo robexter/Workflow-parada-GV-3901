@@ -1,28 +1,29 @@
-GV-3901 · HOMOLOGAÇÃO r9 · Cadastro responsivo para celular
+GV-3901 — HML r18 — Diagnóstico de cadastro (sem alterar banco)
 
-ARQUIVOS DO PACOTE (4)
-- index.html                         -> RAIZ do repositório
-- sw.js                              -> RAIZ do repositório
-- assets/membros-acesso.js           -> pasta assets/
-- assets/cadastro-mobile.css         -> pasta assets/ (NOVO)
+CONTEÚDO PARA GITHUB:
+1) index.html -> raiz do repositório (substituir)
+2) sw.js -> raiz do repositório (substituir)
+3) assets/atividade-diagnostico-r18.js -> pasta assets (ADICIONAR)
 
-1. Fazer backup da branch atual do repositório 'homologacao-da-caldeira-'.
-2. Entrar em https://github.com/robexter/homologacao-da-caldeira-
-3. Subir os quatro arquivos mantendo exatamente os caminhos acima.
-   O arquivo CSS é novo; os outros três substituem os existentes.
-4. Publicar na branch de HOMOLOGAÇÃO (não na base congelada V1.2).
-5. Abrir https://robexter.github.io/homologacao-da-caldeira-/
-   em aba anônima do celular e selecionar 'Solicitar acesso'.
-6. Testar em retrato e paisagem: nome, usuário, senha, confirmação, olhos,
-   Turnstile, botão de cadastro e rolagem vertical sem cortes horizontais.
+ATENÇÃO: Não apague os demais arquivos existentes. O ZIP tem apenas arquivos a alterar.
+O aplicativo principal assets/app.js, a base V1.2 congelada, o banco Supabase,
+e as regras RLS são preservados. O r17 permanece no repositório, mas deixa de ser referenciado.
 
-Observações:
-- O CAPTCHA passa a usar tamanho COMPACTO para telas com largura até 370px;
-  acima disso utiliza tamanho FLEXÍVEL. Não reduz segurança.
-- Cadastro continua com senha mínima de 6 caracteres, conforme r7.
-- Este pacote incorpora as melhorias administrativas da r8.
-- Não altera o Supabase, seus Secrets, RLS ou as regras de aprovação.
-- Não substitui app.js nem o serviço backend. A V1.2 permanece congelada.
-- Para abrir sem problemas, EXTRAIA o ZIP e envie os ARQUIVOS, não o ZIP.
-- Caso já tenha alterações adicionais posteriores à r8, compare antes de
-  substituir 'assets/membros-acesso.js'.
+TESTE CONTROLADO:
+1. Depois de publicar, abra o site em uma aba anônima e faça login como administrador.
+2. Em Planejamento, confira o aviso "Diagnóstico r18 ativo".
+3. Abra + Atividade e confira o aviso "Diagnóstico r18 carregado no cadastro".
+4. Para teste de validação, clique Salvar com campos ainda vazios: a mensagem
+   deve apontar o campo inválido sem realizar qualquer gravação.
+5. Em outro teste, preencha todos os campos COM DADOS FICTÍCIOS e clique Salvar uma vez.
+6. A tarja no topo da tela apresenta o estágio da operação e o erro, se ocorrer.
+7. Após qualquer indicação de sucesso, use a consulta SQL abaixo para confirmar.
+
+SQL LEITURA:
+SELECT version,last_action,updated_at,
+  jsonb_array_length(COALESCE(state->'activities','[]'::jsonb)) AS atividades
+FROM public.gv3901_workspace WHERE code='GV3901';
+
+IMPORTANTE: Este patch é de DIAGNÓSTICO, não altera diretamente a lógica de salvamento.
+Não conclua que uma atividade foi gravada sem conferir no Supabase.
+Não aprove a B0 com planejamento incompleto.
