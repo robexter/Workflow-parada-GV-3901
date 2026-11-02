@@ -12,7 +12,7 @@
     {label:'Etapa 3',pct:25},{label:'Etapa 4',pct:25}
   ];
   const DEFAULT = () => ({id:'',title:'',discipline:'',source:'',from:'',to:'',qty:'',unit:'un.',weight:'',pred:'',critical:false,measurementMode:'quantity',milestonePlan:DEFAULT_MILESTONES()});
-  const state = {draft:DEFAULT(),status:'Cadastro r22 (PARADA REAL) ativo. Utilize o formulário abaixo para cadastrar uma atividade real aprovada pela Manutenção.',level:'info',busy:false,client:null,lastVerified:null,reading:false};
+  const state = {draft:DEFAULT(),status:'Utilize o formulário abaixo para cadastrar uma atividade real aprovada pela Manutenção.',level:'info',busy:false,client:null,lastVerified:null,reading:false};
   const palette = {info:['#edf5fc','#20536d','#b7d5e7'],ok:['#eaf8f0','#155b40','#b3dfc7'],error:['#fff0ee','#8c2723','#e8b4b1']};
   const safe = v => String(v??'');
   const escapeHtml = v => safe(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
