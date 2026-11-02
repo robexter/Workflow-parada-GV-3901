@@ -78,7 +78,7 @@
       if(!bar || bar.querySelector('[data-gv22-env]'))return;
       const badge=document.createElement('span');
       badge.setAttribute('data-gv22-env','');
-      badge.textContent='PARADA · DADOS OPERACIONAIS';
+      badge.textContent='GV-3901 · Acompanhamento da Parada';
       badge.style.cssText='display:inline-block;padding:5px 8px;border:1px solid #b7d3e5;border-radius:7px;font:700 10px/1.3 system-ui;letter-spacing:.03em;background:#eff7fb;color:#20536d;';
       bar.prepend(badge);
     });
