@@ -81,7 +81,7 @@
   }
   function html(){
     return `<section id="${PANEL_ID}" class="card pad" style="margin:15px 0;border:2px solid #276f94;max-width:100%;overflow:hidden">
-      <h2 style="margin:0 0 7px;font-size:19px">Cadastro de atividades — r22 (PARADA REAL)</h2>
+      <h2 style="margin:0 0 7px;font-size:19px">Cadastro de atividades — PARADA</h2>
       <p class="muted" style="font-size:13px;margin:0 0 12px">Novo fluxo de homologação: gravação verificada no Supabase. Não confunda com “Configurar parada”.</p>
       <div role="status" aria-live="polite" data-gv-status style="padding:12px;border-radius:9px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:12px;font-size:13px"></div>
       <div class="actions" style="margin:0 0 12px"><button type="button" class="btn" data-gv-check>Consultar acesso e atividades no banco (sem gravar)</button><strong data-gv-counter style="font-size:13px"></strong></div>
