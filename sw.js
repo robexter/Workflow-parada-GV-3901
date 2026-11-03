@@ -2,7 +2,7 @@
  * Em falha de rede durante navegação, abrir offline.html (consulta somente leitura).
  * Não armazenar credenciais, respostas REST, tokens ou dados operacionais em CacheStorage.
  */
-const CACHE = 'gv3901-v1-1-parada-real-r28-offline-v1';
+const CACHE = 'gv3901-v1-1-parada-real-r29-premium';
 const SHELL = [
   './', './index.html', './assets/app.js', './assets/username-login.js',
   './assets/membros-acesso.js', './assets/ambiente-real-r22.js',
@@ -10,6 +10,8 @@ const SHELL = [
   './assets/codigos-disciplinas-r25.js', './assets/cabecalho-responsivo-r26.css',
   './assets/instalacao-pwa-r27.js',
   './assets/offline-consulta-r28.js', './offline.html',
+  './assets/layout-premium-r29.css', './assets/layout-premium-r29.js',
+  './assets/premium-refinaria-r29.svg',
   './assets/styles.css', './assets/cadastro-mobile.css', './manifest.webmanifest',
   './assets/icon-192.png', './assets/icon-512.png',
   './assets/icon-maskable-192.png', './assets/icon-maskable-512.png',
