@@ -1,0 +1,173 @@
+/* GV-3901 | r26 | Ajuste visual incremental do CABEÇALHO.
+   Base: código do repositório Workflow-parada-GV-3901 consultado em 2026-11-02.
+   Atua somente no header da aplicação; não altera lógica, auth, dados ou botões.
+   Carregar DEPOIS de assets/styles.css e cadastro-mobile.css.
+*/
+
+@media screen and (max-width: 1120px) {
+  .app .main > header.topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+    grid-template-areas:
+      "identificacao titulo"
+      "acoes acoes";
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 102px;
+    padding: 11px 16px;
+    gap: 8px 12px;
+    overflow: visible;
+  }
+
+  .app .main > header.topbar > [data-gv22-env] {
+    grid-area: identificacao;
+    justify-self: start;
+    min-width: 0;
+    max-width: 100%;
+    width: fit-content;
+    padding: 7px 10px !important;
+    border-radius: 10px !important;
+    font-size: 10px !important;
+    line-height: 1.35 !important;
+    letter-spacing: 0 !important;
+    white-space: normal !important;
+    overflow-wrap: break-word;
+    text-align: left;
+  }
+
+  .app .main > header.topbar > div:not(.top-actions) {
+    grid-area: titulo;
+    min-width: 0;
+  }
+
+  .app .main > header.topbar .eyebrow {
+    font-size: 9px;
+    line-height: 1.4;
+    letter-spacing: .09em;
+    overflow-wrap: break-word;
+  }
+
+  .app .main > header.topbar strong {
+    display: block;
+    margin-top: 3px;
+    font-size: 17px;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+  }
+
+  .app .main > header.topbar > .top-actions {
+    grid-area: acoes;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .app .main > header.topbar .top-actions > button {
+    min-height: 40px;
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+}
+
+@media screen and (max-width: 760px) {
+  .app .main > header.topbar {
+    grid-template-columns: minmax(0, .97fr) minmax(0, 1.03fr);
+    min-height: 0;
+    padding: 11px 12px 12px;
+    gap: 10px 10px;
+  }
+
+  .app .main > header.topbar > [data-gv22-env] {
+    display: flex !important;
+    align-items: center;
+    width: 100%;
+    padding: 8px !important;
+    border-radius: 10px !important;
+    font-size: 10px !important;
+  }
+
+  .app .main > header.topbar strong {
+    font-size: 17px;
+  }
+
+  /* Estado da conexão e dois botões com largura simétrica. */
+  .app .main > header.topbar > .top-actions {
+    display: grid;
+    grid-template-columns: minmax(56px, 68px) repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .app .main > header.topbar > .top-actions > .badge {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 40px;
+    margin: 0;
+    padding: 5px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    line-height: 1.2;
+    white-space: normal;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .app .main > header.topbar > .top-actions > button:not([data-action="modal:event"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    margin: 0;
+    padding: 8px 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+  }
+
+  /* A ação de registro já está disponível no botão flutuante mobile. */
+  .app .main > header.topbar > .top-actions > button[data-action="modal:event"] {
+    display: none !important;
+  }
+
+  /* OFFLINE é condição de segurança: exibir o aviso por inteiro, nunca cortar. */
+  .app .main > header.topbar > .top-actions:has(> .badge.amber) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .app .main > header.topbar > .top-actions:has(> .badge.amber) > .badge.amber {
+    grid-column: 1 / -1;
+    min-height: 34px;
+    padding: 7px;
+    white-space: normal;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .app .main > header.topbar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    padding: 9px 10px 11px;
+  }
+  .app .main > header.topbar .eyebrow {font-size: 8px;letter-spacing: .06em;}
+  .app .main > header.topbar strong {font-size: 15px;}
+  .app .main > header.topbar > [data-gv22-env] {font-size: 9px !important;padding: 6px !important;}
+  .app .main > header.topbar > .top-actions {gap: 6px;grid-template-columns: minmax(52px, 58px) repeat(2, minmax(0, 1fr));}
+  .app .main > header.topbar > .top-actions > button:not([data-action="modal:event"]) {font-size: 11px;padding: 8px 4px;}
+}
