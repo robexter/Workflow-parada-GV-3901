@@ -1,10 +1,11 @@
 /* GV-3901 / HOMOLOGAÇÃO: não cachear configuração nem credenciais Supabase. */
-const CACHE = 'gv3901-v1-1-parada-real-r26';
+const CACHE = 'gv3901-v1-1-parada-real-r27';
 const SHELL = [
   './', './index.html', './assets/app.js', './assets/username-login.js',
   './assets/membros-acesso.js', './assets/ambiente-real-r22.js',
   './assets/cadastro-atividades-r22.js', './assets/boot-real-r22.js',
   './assets/codigos-disciplinas-r25.js', './assets/cabecalho-responsivo-r26.css',
+  './assets/instalacao-pwa-r27.js',
   './assets/styles.css', './assets/cadastro-mobile.css', './manifest.webmanifest',
   './assets/icon-192.png', './assets/icon-512.png',
   './assets/icon-maskable-192.png', './assets/icon-maskable-512.png',
