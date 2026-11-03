@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR" data-gv-offline-viewer="1">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#153a4e"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>GV-3901 | Consulta offline V1</title>
+<link rel="icon" type="image/png" href="./assets/icon-192.png"/>
+<style>
+:root{font-family:Inter,"Segoe UI",system-ui,Arial,sans-serif;color:#1a3747;background:#f2f6f9;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;min-height:100svh}h1,h2,p{margin:0}button,input{font:inherit}[hidden]{display:none!important}
+.top{background:#153a4e;color:white;padding:17px max(16px,calc((100vw - 1150px)/2));display:flex;gap:13px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.top strong{font-size:19px;line-height:1.3;display:block}.top small{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#c5e1ef}
+.top .mode{border:1px solid #88b5c8;color:#e6f7fb;border-radius:999px;font-weight:750;font-size:12px;padding:7px 11px;white-space:nowrap}
+main{max-width:1130px;margin:0 auto;padding:20px 15px 90px}.notice{background:#fff5e9;border:1px solid #f3d29c;border-left:4px solid #d68c20;color:#734f24;padding:14px;border-radius:12px;font-size:13px;line-height:1.55;margin-bottom:14px}
+.meta{background:#eaf3f7;border-radius:12px;padding:13px 15px;margin-bottom:15px;font-size:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.card,.surface,.metric{background:white;border-radius:15px;border:1px solid #dde8ed;box-shadow:0 5px 18px rgba(35,75,100,.06)}
+.card{padding:22px;max-width:540px;margin:16px auto}.card h1{font-size:23px;margin-bottom:10px}.card p{color:#526b7b;line-height:1.6;font-size:13px;margin-bottom:12px}
+.status{font-size:13px;line-height:1.6;background:#eef5f9;border-radius:8px;padding:12px;margin:12px 0;overflow-wrap:anywhere}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:750;margin:12px 0}.field input{height:47px;width:100%;border:1px solid #b6cbd5;border-radius:10px;padding:10px 12px;font-size:16px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.btn{border:1px solid #c3d6df;border-radius:9px;background:white;color:#24546a;padding:11px 14px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-weight:750;text-decoration:none;font-size:13px}.btn.primary{background:#076b8d;color:white;border-color:#076b8d}.btn:disabled{opacity:.6}
+.tabs{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;padding:2px 0 11px;scrollbar-width:thin;position:sticky;top:0;background:#f2f6f9;z-index:2}.tabs button{flex:0 0 auto;white-space:nowrap;border:1px solid #c3d6df;background:white;border-radius:999px;padding:10px 14px;min-height:44px;color:#315467;font-size:12px;font-weight:750}.tabs button.selected{background:#076b8d;border-color:#076b8d;color:white}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:13px}.metric{padding:15px;min-width:0}.metric span{font-size:12px;color:#526c79;font-weight:700;display:block}.metric strong{font-size:23px;overflow-wrap:anywhere;display:block;margin:9px 0 6px}.metric small{font-size:11px;color:#637d8c}.surface{padding:18px;margin:14px 0;overflow:hidden}.surface h2{font-size:17px;margin-bottom:14px}.surface p{line-height:1.6;font-size:13px}.empty{font-size:13px;color:#687f8d;padding:18px 4px}
+.table-scroll{max-width:100%;overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12px;min-width:540px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #e0e9ee;vertical-align:top;white-space:normal;overflow-wrap:anywhere}th{color:#496b7d;background:#f5f9fb;font-size:11px}tr:last-child td{border-bottom:0}.gantt{display:grid;gap:9px;max-height:480px;overflow:auto}.gantt-line{display:grid;grid-template-columns:minmax(125px,27%) minmax(0,1fr);gap:10px;align-items:center;font-size:11px;color:#34576b}.gantt-line>div:first-child{overflow-wrap:anywhere}.gantt-track{height:17px;background:#eef4f7;border-radius:7px;position:relative}.gantt-track span{display:block;position:absolute;top:2px;bottom:2px;background:#087598;border-radius:5px}.curve{display:block;width:100%;max-height:370px;aspect-ratio:790/250}.legend{color:#627d8c;font-size:12px}.entry{border-left:3px solid #3d8ca5;padding:9px 13px;margin-bottom:12px;background:#f6fafb;border-radius:0 8px 8px 0}.entry b,.entry small{display:block}.entry small{font-size:11px;color:#648090;margin:4px 0 7px}.entry p{white-space:pre-wrap;overflow-wrap:anywhere}
+footer{text-align:center;font-size:11px;line-height:1.5;color:#627b8b;padding:30px 15px}
+@media(max-width:660px){.top{padding:14px 16px}.top strong{font-size:17px}.top .mode{font-size:10px}main{padding:14px 12px 80px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:13px}.metric strong{font-size:19px}.surface{padding:13px}.card{padding:17px}.notice{font-size:12px}}
+@media(max-width:330px){.metrics{grid-template-columns:1fr}.top .mode{width:100%;text-align:center}.btn{width:100%}}
+</style>
+<script defer src="./assets/offline-consulta-r28.js?v=gv3901-offline-r28"></script>
+</head>
+<body>
+<header class="top"><div><small>GV-3901 · Parada de manutenção</small><strong>Consulta do último estado sincronizado</strong></div><span class="mode">OFFLINE · SOMENTE LEITURA</span></header>
+<main>
+<div class="notice"><b>Atenção:</b> os registros exibidos podem estar desatualizados. Esta página não consulta o banco nem permite cadastrar atividades, alterar B0, registrar medições ou enviar dados. Confirme informações críticas com o procedimento e o sistema oficial.</div>
+<div class="meta" id="offline-meta" hidden><span>Última sincronização: <b id="offline-last-sync">—</b></span><span>Versão: <b id="offline-version">—</b></span><span>Data de corte: <b id="offline-cutoff">—</b></span></div>
+<div class="status" role="status" aria-live="polite" id="offline-info">Verificando disponibilidade da cópia local...</div>
+<section class="card" id="offline-unlock"><h1>Desbloquear consulta</h1><p>Informe a senha local cadastrada ao preparar a cópia em Administração. A senha não é enviada ao Supabase.</p>
+<form id="unlock-form"><label class="field">Senha local<input id="offline-password" type="password" required minlength="10" autocomplete="off"/></label><div class="actions"><button class="btn primary" type="submit">Desbloquear cópia</button></div></form>
+</section>
+<nav class="tabs" id="offline-tabs" aria-label="Seções da consulta" hidden><button type="button" data-view="resumo" class="selected">Resumo</button><button type="button" data-view="planejamento">Planejamento / Gantt</button><button type="button" data-view="curva">Curva S / medições</button><button type="button" data-view="sh2">SH2</button><button type="button" data-view="diario">Relatos</button><button type="button" data-view="pendencias">Pendências</button></nav>
+<div id="offline-screen" hidden></div>
+<div class="actions"><button class="btn" id="offline-return" type="button">Abrir aplicativo online</button><button class="btn" id="offline-wipe" type="button">Apagar cópia neste dispositivo</button></div>
+</main><footer>GV-3901 Offline V1 · Exclusivamente consulta · Sem edição e sem sincronização automática</footer>
+</body>
+</html>
