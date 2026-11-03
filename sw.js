@@ -13,6 +13,7 @@ const SHELL = [
   './assets/layout-premium-r31.css', './assets/layout-premium-r31-1.js',
   './assets/cabecalho-pc-sem-flutuar-r31-2.css',
   './assets/premium-refinaria-r31.svg',
+  './assets/pc-reorganizado-r31-3.css',
   './assets/styles.css', './assets/cadastro-mobile.css', './manifest.webmanifest',
   './assets/icon-192.png', './assets/icon-512.png',
   './assets/icon-maskable-192.png', './assets/icon-maskable-512.png',
