@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="280" viewBox="0 0 1440 280" preserveAspectRatio="xMidYMid slice">
+<defs>
+  <linearGradient id="night" x1="0" x2="1" y1="0" y2="0"><stop stop-color="#092b44"/><stop offset=".55" stop-color="#10476b"/><stop offset="1" stop-color="#071f37"/></linearGradient>
+  <linearGradient id="tower" x1="0" x2="1"><stop stop-color="#3b789c" stop-opacity=".18"/><stop offset=".5" stop-color="#6aa4bb" stop-opacity=".49"/><stop offset="1" stop-color="#173752" stop-opacity=".9"/></linearGradient>
+  <radialGradient id="flare"><stop stop-color="#e2c98a" stop-opacity=".4"/><stop offset="1" stop-color="#b6d8eb" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1600" height="280" fill="url(#night)"/>
+<path d="M0 205L350 0H1440V280H0" fill="#fff" opacity=".017"/>
+<circle cx="1180" cy="90" r="190" fill="url(#flare)" opacity=".36"/>
+<g stroke="#8fc3d6" stroke-width="2.2" opacity=".34" fill="none">
+ <path d="M930 230V95h52v135M943 104h26M945 127h23M945 151h23M945 175h23M952 95V80h7v15M950 83h13"/>
+ <path d="M1060 230V46h63v184M1070 64h44M1070 92h44M1070 120h44M1070 149h44M1070 177h44M1070 205h44M1086 46V27h13v19"/>
+ <path d="M1207 230V112h41v118M1217 130h23M1217 158h23M1217 186h23M1217 213h23M1227 112V94"/>
+ <path d="M1304 230V76h31v154M1310 96h18M1310 123h18M1310 151h18M1310 178h18M1310 205h18M1320 76V55"/>
+ <path d="M870 238V163h38v75M873 180h32M872 205h34M980 236V196h42v40M1020 196V155h29v81M1124 224h175M850 236h540"/>
+ <path d="M884 164l4-12h14l4 12M1217 111l4-10h15l4 10M1311 76l6-13h5l6 13M1058 48l6-11h54l6 11"/>
+ <path d="M870 204h529M875 218h515M965 178h350M1001 194h302" opacity=".65"/>
+</g>
+<g stroke="#84b7cb" stroke-width=".8" opacity=".20">
+<path d="M930 121h52M930 146h52M930 171h52M930 196h52M1061 75h62M1061 103h62M1061 131h62M1061 160h62M1207 143h41M1207 171h41"/>
+</g>
+<g fill="#d7b36f" opacity=".88">
+ <circle cx="944" cy="134" r="2.1"/><circle cx="943" cy="188" r="2"/><circle cx="967" cy="162" r="1.7"/>
+ <circle cx="1084" cy="87" r="1.8"/><circle cx="1110" cy="154" r="2.4"/><circle cx="1099" cy="194" r="2.2"/>
+ <circle cx="1238" cy="181" r="2.1"/><circle cx="1312" cy="120" r="2"/><circle cx="1381" cy="209" r="2"/>
+</g>
+<path d="M0 238h1440" stroke="#9fd9e8" stroke-opacity=".2" stroke-width="1.5"/>
+</svg>
