@@ -1,0 +1,12 @@
+/* GV-3901 r31.2 — correção exclusivamente para computador.
+   O cabeçalho premium volta a participar da rolagem normal da página.
+   A interface mobile (até 760 px) permanece INTACTA.
+   Carregar DEPOIS do layout-premium-r31.css.
+*/
+@media screen and (min-width: 761px) {
+  body .app .main > header.topbar {
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
+  }
+}
