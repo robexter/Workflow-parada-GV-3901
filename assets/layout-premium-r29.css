@@ -1,0 +1,325 @@
+/* GV-3901 · r29 PREMIUM — PROJETO VISUAL APROVADO
+   Compatível com r22 (Parada Real), r25 (disciplinas), r26 (cabeçalho),
+   r27 (instalação) e r28 (Offline V1). Sem alterações funcionais.
+   Carregar APÓS todos os CSS anteriores para manter a precedência.
+*/
+:root {
+  --gv29-ink:#102e45;
+  --gv29-dark:#092e49;
+  --gv29-blue:#0c5d83;
+  --gv29-teal:#087f92;
+  --gv29-line:#d7e4eb;
+  --gv29-muted:#697f8d;
+  --gv29-shadow:0 8px 24px rgba(19,56,80,.10);
+  --gv29-shadow-hover:0 12px 28px rgba(14,58,84,.15);
+}
+body { background:linear-gradient(160deg,#f5f9fc 0%,#edf5f9 52%,#f5f9fb 100%); color:var(--gv29-ink); }
+.app {background:transparent;}
+.app .sidebar { background:linear-gradient(180deg,#072b43,#0b3854 50%,#092a40);border-right:1px solid #174762;box-shadow:7px 0 30px rgba(6,38,60,.07);}
+.app .sidebar .brand {border-color:#29506a;}
+.app .sidebar .brand-icon {background:linear-gradient(145deg,#079db1,#0a6483);box-shadow:0 6px 15px #0002;}
+.app .sidebar .nav button {border:1px solid transparent;transition:background .15s,border-color .15s;}
+.app .sidebar .nav button:hover {background:rgba(255,255,255,.08);}
+.app .sidebar .nav button.active {background:linear-gradient(90deg,rgba(15,145,164,.24),rgba(255,255,255,.06));border-color:rgba(137,206,225,.23);color:#fff;}
+/* Faixa de marca azul petróleo e linha de ações do cabeçalho */
+body .app .main > header.topbar {
+  --gv29-gutter:clamp(14px,2.2vw,26px);
+  display:grid;
+  grid-template-columns:minmax(165px,1fr) minmax(145px,1.2fr) auto;
+  grid-template-rows:auto auto;
+  grid-template-areas:"hero hero hero" "identificacao titulo acoes";
+  align-items:center;
+  column-gap:clamp(12px,2vw,26px);
+  row-gap:0;
+  background:#fff;
+  width:100%;max-width:100%;height:auto;min-height:0;
+  padding:0 var(--gv29-gutter) 16px;
+  border-bottom:1px solid #e1ecf2;
+  box-shadow:0 4px 19px rgba(14,47,68,.05);
+  overflow:visible;
+}
+body .app .main > header.topbar > .gv29-hero {
+  grid-area:hero;
+  display:flex;
+  align-items:center;
+  gap:13px;
+  height:88px;
+  min-width:0;
+  width:auto;
+  padding:12px clamp(16px,2.7vw,32px);
+  margin:0 calc(-1 * var(--gv29-gutter)) 15px;
+  color:#fff;
+  background:linear-gradient(90deg,rgba(8,45,71,.96) 0%,rgba(10,60,89,.91) 51%,rgba(5,30,49,.55) 100%),url('./premium-refinaria-r29.svg') center right/cover no-repeat;
+  border-bottom:2px solid #2ca8b9;
+  box-shadow:inset 0 -1px rgba(255,255,255,.06);
+  position:relative;
+  isolation:isolate;
+}
+body .app .main > header.topbar > .gv29-hero .gv29-hero-icon {
+  display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;
+  height:44px;width:44px;border:1px solid rgba(213,239,248,.28);
+  background:rgba(255,255,255,.07);border-radius:12px;color:#dff6fc;
+}
+body .app .main > header.topbar > .gv29-hero .gv29-hero-copy {
+  display:flex;flex-direction:column;gap:2px;min-width:0;
+}
+body .app .main > header.topbar > .gv29-hero .gv29-hero-copy strong {
+  font-size:clamp(20px,1.8vw,26px);font-weight:830;line-height:1.1;
+  color:#fff;letter-spacing:.01em;margin:0;text-wrap:balance;
+}
+body .app .main > header.topbar > .gv29-hero .gv29-hero-copy small {
+  color:#c4dce8;font-size:clamp(11px,1vw,14px);line-height:1.4;letter-spacing:.015em;
+}
+body .app .main > header.topbar > .gv29-hero .gv29-hero-accent {
+  margin-left:auto;width:4px;height:36px;border-radius:5px;background:#4bd4dc;opacity:.65;
+}
+body .app .main > header.topbar > [data-gv22-env] {
+  grid-area:identificacao;
+  display:flex!important;align-items:center;gap:11px;
+  width:100%;min-width:0;max-width:290px;
+  padding:11px 13px!important;min-height:58px;
+  margin:0;
+  background:linear-gradient(140deg,#07658b,#073752)!important;
+  color:#fff!important;border:1px solid #155e7e!important;
+  box-shadow:0 7px 17px rgba(11,87,119,.18);
+  border-radius:12px!important;
+  font:700 12px/1.35 Inter,system-ui,sans-serif!important;
+  letter-spacing:0!important;
+  white-space:normal!important;overflow-wrap:anywhere;text-align:left;
+}
+body .app .main > header.topbar > [data-gv22-env]::before {
+  content:'▱';display:grid;place-items:center;
+  flex:0 0 25px;height:28px;
+  color:#9fe4ec;font-weight:800;font-size:27px;line-height:1;
+}
+body .app .main > header.topbar > div:not(.top-actions):not(.gv29-hero) {
+  grid-area:titulo;min-width:0;align-self:center;
+}
+body .app .main > header.topbar .eyebrow {
+  color:#718796;letter-spacing:.13em;font-size:10px;
+  font-weight:800;line-height:1.35;overflow-wrap:anywhere;
+}
+body .app .main > header.topbar > div:not(.top-actions):not(.gv29-hero) > strong {
+  display:block;margin:4px 0 0;color:#112f46;font-size:clamp(19px,1.9vw,25px);
+  line-height:1.15;font-weight:850;letter-spacing:-.035em;
+}
+body .app .main > header.topbar > .top-actions {
+  grid-area:acoes;display:flex;flex-wrap:nowrap;
+  align-items:center;justify-content:flex-end;
+  width:auto;min-width:0;margin:0;gap:9px;
+}
+body .app .main > header.topbar .top-actions > .badge {
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:44px;max-width:100%;height:41px;border-radius:11px;
+  background:#f1f7f8;color:#1d6e73;border:1px solid #d5e9e8;
+  font-size:11px;font-weight:800;
+}
+body .app .main > header.topbar .top-actions > .badge.amber {
+  background:#fff1dd;color:#96590e;border-color:#f2d9b2;
+}
+body .app .main > header.topbar .top-actions > .btn {
+  min-height:42px;padding:10px 14px;border:1px solid #a6c9dc;
+  background:#fff;border-radius:11px;
+  font-size:12px;line-height:1.15;font-weight:760;color:#153c57;
+  box-shadow:0 4px 10px rgba(14,65,91,.05);
+  white-space:nowrap;text-align:center;
+  transition:background .18s,box-shadow .18s,transform .18s;
+}
+body .app .main > header.topbar .top-actions > .btn[data-action="cloud-refresh"]::before {content:'↻';font-size:19px;line-height:0;transform:translateY(-1px);color:#087d94;font-weight:650;}
+body .app .main > header.topbar .top-actions > .btn[data-action="install"] {background:linear-gradient(145deg,#096588,#06446b);color:white;border-color:#0b658c;}
+body .app .main > header.topbar .top-actions > .btn[data-action="install"]::before {content:'↓';font-size:18px;font-weight:850;line-height:0;transform:translateY(-1px);}
+body .app .main > header.topbar .top-actions > .btn:hover {box-shadow:var(--gv29-shadow);transform:translateY(-1px);}
+/* Conteúdo: cabeçalhos espaçosos, indicação de status e botões */
+body .app .main .workspace {
+  max-width:1520px;padding:clamp(17px,2.5vw,32px) clamp(14px,2.7vw,32px) 120px;
+}
+body .app .main .workspace > .warning {
+  display:flex;align-items:center;gap:12px;
+  padding:12px 15px;margin-bottom:clamp(20px,2vw,27px);
+  background:linear-gradient(100deg,#fff8eb,#fffdf8);
+  border:1px solid #efd6ad;border-left:4px solid #d7a24d;
+  border-radius:13px;color:#87591d;
+  font-size:12px;line-height:1.5;box-shadow:0 3px 12px rgba(105,74,28,.04);
+  overflow-wrap:anywhere;
+}
+body .app .main .workspace > .warning strong {font-weight:850;color:#7d5015;letter-spacing:.015em;}
+body .app .main .head {gap:18px;margin-bottom:24px;}
+body .app .main .head .eyebrow {font-size:11px;letter-spacing:.17em;color:#607e91;font-weight:800;}
+body .app .main .head h1 {
+  font-size:clamp(26px,2.8vw,38px);line-height:1.14;
+  letter-spacing:-.04em;font-weight:860;color:#112d44;margin-top:6px;
+}
+body .app .main .head p {
+  color:#687f8f;font-size:clamp(12px,1.3vw,15px);line-height:1.7;
+  max-width:670px;margin-top:12px;
+}
+body .app .main .btn {
+  border-radius:11px;border-color:#c6d9e4;
+  font-weight:760;transition:transform .14s,box-shadow .14s,background .14s;
+}
+body .app .main .btn.primary {background:linear-gradient(125deg,#087c97,#0a577b);border-color:#0e778c;box-shadow:0 7px 17px rgba(8,91,117,.19);}
+body .app .main .btn.primary:hover {background:linear-gradient(125deg,#07859f,#084e72);}
+body .app .main .btn:hover {box-shadow:0 5px 14px rgba(20,62,88,.10);}
+body .app .main .filterbar {gap:12px;margin:20px 0 18px;align-items:end;}
+body .app .main .form-field label,body .app .main .filterbar label {
+  color:#25465a;font-size:12px;font-weight:780;margin-bottom:7px;
+}
+body .app .main input.input,body .app .main select.input,
+body .app .main .filterbar .operator-chip {
+  min-height:45px;border:1px solid #c9dbe4;border-radius:12px;
+  background:#fff;box-shadow:0 3px 9px rgba(32,77,100,.035);
+  color:#203e51;
+}
+body .app .main .filterbar .operator-chip {padding:12px 14px;font-size:13px;font-weight:760;overflow-wrap:anywhere;}
+body .app .main .cards {gap:clamp(10px,1.6vw,16px);margin-bottom:clamp(16px,2vw,24px);}
+body .app .main .cards .card {
+  border:1px solid var(--gv29-line);border-radius:20px;
+  background:linear-gradient(156deg,#fff 0%,#fff 73%,#f8fcfd 100%);
+  box-shadow:var(--gv29-shadow);position:relative;min-width:0;
+}
+body .app .main .cards .card.kpi {
+  padding:clamp(17px,2vw,24px);
+  min-height:145px;overflow:hidden;
+  border-top:1px solid var(--gv29-line);
+}
+body .app .main .cards .card.kpi::after {
+  content:'';position:absolute;width:115px;height:85px;border-radius:100%;
+  background:radial-gradient(circle,rgba(32,161,172,.08),rgba(32,161,172,0) 68%);
+  top:-34px;right:-40px;pointer-events:none;
+}
+body .app .main .cards .card.kpi .label {
+  font-size:12px;font-weight:780;color:#627f8d;letter-spacing:.01em;
+}
+body .app .main .cards .card.kpi .label::before {
+  content:'▦';display:inline-grid;place-items:center;vertical-align:middle;
+  width:28px;height:28px;margin-right:8px;
+  background:#eaf6f6;color:#087f8d;border-radius:8px;font-size:16px;
+}
+/* Símbolos decorativos discretos para distinguir os quatro indicadores. */
+body .app .main .cards .card.kpi:nth-child(2) .label::before{content:'✓';}
+body .app .main .cards .card.kpi:nth-child(3) .label::before{content:'⇄';}
+body .app .main .cards .card.kpi:nth-child(4) .label::before{content:'⚑';}
+body .app .main .cards .card.kpi .num {
+  margin-top:14px;font-size:clamp(21px,2vw,28px);line-height:1.15;
+  letter-spacing:-.045em;color:#112e45;font-weight:860;
+  overflow-wrap:anywhere;white-space:normal;
+}
+body .app .main .cards .card.kpi .desc {
+  color:#748a99;font-size:11px;line-height:1.55;margin-top:10px;
+}
+body .app .main .card:not(.kpi) {border-radius:19px;border-color:var(--gv29-line);box-shadow:var(--gv29-shadow);}
+body .app .main .card.pad {padding:clamp(17px,1.9vw,24px);}
+body .app .main .soft {border-radius:12px;}
+body .app .main .chart-wrap {border-radius:14px;}
+body .app .main .table-wrap {border-radius:12px;}
+/* Navegação mobile, painel flutuante e prevenção de transbordamentos */
+@media screen and (max-width:1150px) {
+  body .app .main > header.topbar {
+    grid-template-columns:minmax(138px,1fr) minmax(134px,1fr);
+    grid-template-areas:"hero hero" "identificacao titulo" "acoes acoes";
+    row-gap:10px;column-gap:12px;
+  }
+  body .app .main > header.topbar > .gv29-hero {margin-bottom:3px;}
+  body .app .main > header.topbar > .top-actions {
+    width:100%;display:flex;justify-content:flex-end;gap:9px;
+  }
+  body .app .main > header.topbar > [data-gv22-env] {max-width:100%;}
+}
+@media screen and (max-width:760px) {
+  body .app .main > header.topbar {
+    --gv29-gutter:14px;
+    grid-template-columns:minmax(0,.97fr) minmax(0,1.03fr);
+    grid-template-areas:"hero hero" "identificacao titulo" "acoes acoes";
+    gap:11px 10px;padding:0 var(--gv29-gutter) 14px;
+    box-shadow:0 3px 12px rgba(19,55,76,.055);
+  }
+  body .app .main > header.topbar > .gv29-hero {
+    height:82px;margin:0 calc(-1 * var(--gv29-gutter)) 1px;
+    padding:11px 17px;gap:10px;
+  }
+  body .app .main > header.topbar > .gv29-hero .gv29-hero-icon {flex-basis:39px;width:39px;height:39px;}
+  body .app .main > header.topbar > .gv29-hero .gv29-hero-copy strong {font-size:21px;}
+  body .app .main > header.topbar > .gv29-hero .gv29-hero-copy small {font-size:12px;}
+  body .app .main > header.topbar > .gv29-hero .gv29-hero-accent {height:26px;}
+  body .app .main > header.topbar > [data-gv22-env] {
+    min-height:60px;padding:9px!important;font-size:10.5px!important;
+    box-shadow:0 5px 13px rgba(5,70,98,.13);
+  }
+  body .app .main > header.topbar > [data-gv22-env]::before {flex-basis:18px;font-size:21px;}
+  body .app .main > header.topbar .eyebrow {font-size:9px;letter-spacing:.08em;}
+  body .app .main > header.topbar > div:not(.top-actions):not(.gv29-hero) > strong {font-size:19px;}
+  body .app .main > header.topbar > .top-actions {
+    display:grid;grid-template-columns:minmax(45px,55px) repeat(2,minmax(0,1fr));
+    align-items:stretch;justify-content:stretch;width:100%;gap:9px;
+  }
+  body .app .main > header.topbar .top-actions > .badge {
+    display:flex!important;min-height:43px;height:auto;
+    font-size:10px;padding:7px 6px;text-align:center;
+    white-space:normal;overflow-wrap:anywhere;
+  }
+  body .app .main > header.topbar .top-actions > .btn:not([data-action="modal:event"]) {
+    display:inline-flex;align-items:center;justify-content:center;
+    width:100%;min-width:0;min-height:43px;
+    padding:8px 7px;border-radius:11px;font-size:12px;
+    line-height:1.2;white-space:nowrap;text-align:center;
+  }
+  body .app .main > header.topbar .top-actions > .btn[data-action="modal:event"] {display:none!important;}
+  body .app .main > header.topbar .top-actions:has(> .badge.amber) {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body .app .main > header.topbar .top-actions:has(> .badge.amber) > .badge.amber {
+    grid-column:1/-1;min-height:34px;
+  }
+  body .app .main .head h1 {font-size:clamp(25px,6.6vw,32px);}
+  body .app .main .head p {font-size:13px;line-height:1.65;}
+  body .app .main .head .buttons {margin-top:16px;}
+  body .app .main .head .buttons > .btn.primary {min-height:44px;padding:12px 16px;font-size:13px;}
+  body .app .main .filterbar {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  body .app .main .filterbar .form-field {min-width:0;}
+  body .app .main .filterbar > .btn {min-height:44px;font-size:12px;}
+  body .app .main .cards {grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;}
+  body .app .main .cards .card.kpi {min-height:148px;padding:17px 14px;}
+  body .app .main .cards .card.kpi .label {font-size:11px;}
+  body .app .main .cards .card.kpi .label::before {width:26px;height:26px;font-size:14px;}
+  body .app .main .cards .card.kpi .num {font-size:clamp(20px,5vw,28px);}
+  body .app .main .mobile-tabs {
+    background:rgba(255,255,255,.97);backdrop-filter:blur(12px);
+    border-top:1px solid #d5e5ed;box-shadow:0 -8px 26px rgba(22,59,80,.12);
+    border-radius:20px 20px 0 0;padding:8px 5px calc(9px + env(safe-area-inset-bottom));
+  }
+  body .app .main .quick-fab {background:linear-gradient(145deg,#0aa4b5,#087894);box-shadow:0 9px 23px rgba(6,108,139,.27);border:2px solid rgba(255,255,255,.82);}
+}
+/* mobile-tabs e quick-fab são irmãos de .main dentro do .app: seletor independente */
+@media screen and (max-width:760px) {
+  body .app > .mobile-tabs {
+    background:rgba(255,255,255,.97);backdrop-filter:blur(12px);
+    border-top:1px solid #d5e5ed;box-shadow:0 -8px 26px rgba(22,59,80,.12);
+    border-radius:20px 20px 0 0;padding:8px 5px calc(9px + env(safe-area-inset-bottom));
+  }
+  body .app > .mobile-tabs button {min-width:0;max-width:100%;font-size:10px;line-height:1.2;}
+  body .app > .mobile-tabs button.active {color:#087992;font-weight:850;}
+  body .app > .quick-fab {
+    background:linear-gradient(145deg,#09a2b2,#086888);color:#fff;
+    border:2px solid #e9fdff;box-shadow:0 9px 23px rgba(6,108,139,.27);
+  }
+}
+@media screen and (max-width:365px) {
+  body .app .main > header.topbar {--gv29-gutter:10px;gap:9px 8px;}
+  body .app .main > header.topbar > .gv29-hero {height:74px;padding:9px 13px;}
+  body .app .main > header.topbar > .gv29-hero .gv29-hero-copy strong {font-size:19px;}
+  body .app .main > header.topbar > [data-gv22-env] {font-size:9.5px!important;padding:7px!important;}
+  body .app .main > header.topbar > div:not(.top-actions):not(.gv29-hero) > strong {font-size:17px;}
+  body .app .main > header.topbar .top-actions {grid-template-columns:44px repeat(2,minmax(0,1fr));gap:6px;}
+  body .app .main > header.topbar .top-actions > .btn:not([data-action="modal:event"]) {font-size:11px;padding:8px 3px;}
+  body .app .main .cards .card.kpi {padding:14px 11px;}
+  body .app .main .cards .card.kpi .num {font-size:20px;}
+}
+@media screen and (min-width:761px) and (max-width:1150px) {
+  body .app .main > header.topbar > .top-actions > button {min-height:40px;}
+}
+@media (prefers-reduced-motion:reduce) {
+  body .app .main .btn,body .app .sidebar .nav button{transition:none!important;}
+}
+@media print {
+  body .app .main > header.topbar .gv29-hero{display:none!important;}
+}
