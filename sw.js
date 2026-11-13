@@ -2,10 +2,10 @@
  * Em falha de rede durante navegação, abrir offline.html (consulta somente leitura).
  * Não armazenar credenciais, respostas REST, tokens ou dados operacionais em CacheStorage.
  */
-const CACHE = 'gv3901-v1-1-parada-real-r31-2-pc-scroll';
+const CACHE = 'gv3901-v1-1-parada-real-r32-membros-admin';
 const SHELL = [
   './', './index.html', './assets/app.js', './assets/username-login.js',
-  './assets/membros-acesso.js', './assets/ambiente-real-r22.js',
+  './assets/membros-acesso.js', './assets/membros-admin-only-r32.js', './assets/ambiente-real-r22.js',
   './assets/cadastro-atividades-r22.js', './assets/boot-real-r22.js',
   './assets/codigos-disciplinas-r25.js', './assets/cabecalho-responsivo-r26.css',
   './assets/instalacao-pwa-r27.js',
